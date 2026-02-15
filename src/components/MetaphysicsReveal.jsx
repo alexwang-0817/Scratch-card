@@ -56,11 +56,11 @@ export function MetaphysicsReveal({ stats }) {
 
                         {renderCategoryBlock(
                             metaphysics.topCP,
-                            "CP值之王",
+                            "最佳CP值",
                             TrendingUp,
                             "from-purple-50 to-pink-50", "border-purple-100", "text-purple-800", "bg-purple-500", "bg-purple-100", "text-gray-800",
                             true, false, false,
-                            () => handleOpen('topCP', "CP值之王", 'cp')
+                            () => handleOpen('topCP', "最佳CP值", 'cp')
                         )}
 
                         {renderCategoryBlock(
@@ -128,10 +128,6 @@ function renderCategoryBlock(
                 <Icon className="w-4 h-4" /> {title}
             </h4>
 
-            {/* Hint Icon (Show on hover) */}
-            <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Sparkles className="w-4 h-4 text-yellow-500" />
-            </div>
 
             {/* 1st Place (Prominent) */}
             <div className="bg-white/80 rounded-lg p-3 border border-white/50 mb-2 shadow-sm flex-1 flex flex-col justify-center items-center text-center relative overflow-hidden group-hover:bg-white/95 transition-colors">

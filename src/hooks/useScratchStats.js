@@ -86,7 +86,8 @@ export function useScratchStats() {
                         name: lottery ? lottery.name : lotteryId,
                         count: 0, win: 0, spent: 0, reports: 0,
                         winCount: 0, // Track number of winning tickets
-                        prizeDist: {} // Track distribution of prizes
+                        prizeDist: {}, // Track distribution of prizes
+                        ticketStats: {} // Track winning counts per ticket number
                     };
                 }
                 if (isPast && !lsPast[lotteryId]) {
@@ -110,18 +111,15 @@ export function useScratchStats() {
                 ls[lotteryId].reports += 1;
 
                 if (dist > 0) {
-                    ls[lotteryId].winCount += count; // Assuming 'count' tickets all won 'dist' total? 
-                    // WAIT. 'dist' is 'win_amount' from data.
-                    // If submission has count=1, dist is separate.
-                    // If count > 1 (bulk), dist is total? Or per ticket?
-                    // Submission form says: entries have items. one item one ticket.
-                    // `result.push({ ..., count: 1, win_amount: ... })`.
-                    // So usually count is 1.
-                    // If count > 1, and win_amount > 0, does it mean ALL won?
-                    // User submission flow implies 1 ticket per entry if using detail mode.
-                    // So assuming dist > 0 means it's a winning ticket.
+                    ls[lotteryId].winCount += count;
                     if (!ls[lotteryId].prizeDist[dist]) ls[lotteryId].prizeDist[dist] = 0;
                     ls[lotteryId].prizeDist[dist] += count;
+
+                    // Update Ticket Stats (Only for wins)
+                    if (ticketNo) {
+                        if (!ls[lotteryId].ticketStats[ticketNo]) ls[lotteryId].ticketStats[ticketNo] = 0;
+                        ls[lotteryId].ticketStats[ticketNo] += count;
+                    }
                 } else {
                     // Record $0 wins (losses) in prizeDist too?
                     if (!ls[lotteryId].prizeDist[0]) ls[lotteryId].prizeDist[0] = 0;

@@ -454,7 +454,7 @@ export function SubmissionForm({ onSubmit, loading }) {
                                                                 onClick={handleAddEntry}
                                                                 className="w-full py-3 border-2 border-dashed border-gray-300 text-gray-500 rounded-lg hover:border-yellow-400 hover:text-yellow-600 hover:bg-yellow-50 transition-colors flex items-center justify-center gap-1 text-sm font-bold mb-6"
                                                             >
-                                                                新增種類 +
+                                                                新增款式 +
                                                             </button>
                                                         </GlassCard>
                                                     </motion.div>

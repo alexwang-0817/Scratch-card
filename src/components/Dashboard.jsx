@@ -48,7 +48,6 @@ export function Dashboard({ stats, loading }) {
                                         <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200 group-hover:border-yellow-100 group-hover:bg-yellow-50">${l.price}</span>
                                     </h4>
                                     <div className="text-sm text-gray-500 mt-1 flex flex-wrap justify-start gap-3">
-                                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-400"></span> 回報人數: {lStat.reports}</span>
                                         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-400"></span> 總張數: {lStat.count}</span>
                                     </div>
                                 </div>
@@ -56,9 +55,18 @@ export function Dashboard({ stats, loading }) {
                                 {/* Stats */}
                                 <div className="flex flex-col items-end min-w-[80px] md:min-w-[120px] bg-gray-50 p-2 md:p-3 rounded-lg group-hover:bg-yellow-50/30 transition-colors">
                                     <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-widest mb-1 font-semibold group-hover:text-yellow-600/70">中獎率</div>
-                                    <div className={`text-xl md:text-2xl font-black ${lWinRate > 50 ? 'text-green-600' : lWinRate > 30 ? 'text-yellow-600' : 'text-red-500'}`}>
-                                        {lWinRate.toFixed(1)}%
-                                    </div>
+                                    {lStat.count === 0 ? (
+                                        <div className="text-xl md:text-2xl font-black text-gray-300">
+                                            -
+                                        </div>
+                                    ) : (
+                                        <div className={`text-xl md:text-2xl font-black ${lWinRate > 50 ? 'text-green-600' :
+                                                lWinRate >= 30 ? 'text-yellow-500' :
+                                                    'text-gray-400'
+                                            }`}>
+                                            {lWinRate.toFixed(1)}%
+                                        </div>
+                                    )}
                                     <div className="text-[10px] md:text-xs text-gray-400 mt-1 flex items-center gap-1 whitespace-nowrap">
                                         官方: {l.win_rate}%
                                         <ChevronRight className="w-3 h-3 text-gray-300 group-hover:text-yellow-400 opacity-0 group-hover:opacity-100 transition-all -mr-2 hidden md:block" />
@@ -74,7 +82,7 @@ export function Dashboard({ stats, loading }) {
             {selectedLottery && (
                 <PrizeStructureModal
                     lottery={selectedLottery}
-                    stats={selectedLottery ? (stats.lotteryStats[selectedLottery.id] || { count: 0, win: 0, spent: 0, reports: 0, winCount: 0, prizeDist: {} }) : null}
+                    stats={selectedLottery ? (stats.lotteryStats[selectedLottery.id] || { count: 0, win: 0, spent: 0, reports: 0, winCount: 0, prizeDist: {}, ticketStats: {} }) : null}
                     isOpen={!!selectedLottery}
                     onClose={() => setSelectedLottery(null)}
                 />

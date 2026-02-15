@@ -1,0 +1,232 @@
+[
+    {
+        "id": "2026-super-red-2000",
+        "name": "2000萬超級紅包",
+        "price": 2000,
+        "win_rate": 69.34,
+        "top_prize": 20000000,
+        "img_url": "https://images.unsplash.com/photo-1635422899099-28198dd9086d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bHVja3klMjBtb25leXxlbnwwfHwwfHx8MA%3D%3D",
+        "expected_value": 1400,
+        "description": "史上最高頭獎，新春限定！",
+        "total_tickets": 8000000,
+        "total_in_book": 18,
+        "prizes": [
+            {
+                "amount": 20000000,
+                "count": 7
+            },
+            {
+                "amount": 2000000,
+                "count": 100
+            },
+            {
+                "amount": 1000000,
+                "count": 500
+            },
+            {
+                "amount": 100000,
+                "count": 4000
+            },
+            {
+                "amount": 30000,
+                "count": 12000
+            },
+            {
+                "amount": 10000,
+                "count": 40000
+            },
+            {
+                "amount": 5000,
+                "count": 280000
+            },
+            {
+                "amount": 2000,
+                "count": 1200000
+            },
+            {
+                "amount": 1000,
+                "count": 2400000
+            }
+        ]
+    },
+    {
+        "id": "2026-golden-horse-1000",
+        "name": "1200萬大吉利",
+        "price": 1000,
+        "win_rate": 70.0,
+        "top_prize": 12000000,
+        "img_url": "https://images.unsplash.com/photo-1610419827361-9f93922306f6?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGx1Y2t5fGVufDB8fDB8fHww",
+        "expected_value": 700,
+        "description": "中獎率高達70%，過年必刮！",
+        "total_tickets": 6000000,
+        "total_in_book": 25,
+        "prizes": [
+            {
+                "amount": 12000000,
+                "count": 5
+            },
+            {
+                "amount": 1000000,
+                "count": 80
+            },
+            {
+                "amount": 100000,
+                "count": 500
+            },
+            {
+                "amount": 50000,
+                "count": 1200
+            },
+            {
+                "amount": 10000,
+                "count": 10000
+            },
+            {
+                "amount": 5000,
+                "count": 50000
+            },
+            {
+                "amount": 2000,
+                "count": 300000
+            },
+            {
+                "amount": 1000,
+                "count": 1800000
+            },
+            {
+                "amount": 500,
+                "count": 1000000
+            }
+        ]
+    },
+    {
+        "id": "2026-wealth-god-500",
+        "name": "金馬迎春",
+        "price": 500,
+        "win_rate": 42.02,
+        "top_prize": 5000000,
+        "img_url": "https://images.unsplash.com/photo-1548438294-1ad5d5f4f063?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Z29sZHxlbnwwfHwwfHx8MA%3D%3D",
+        "expected_value": 300,
+        "description": "500元首選，五百萬等你拿",
+        "total_tickets": 5000000,
+        "total_in_book": 50,
+        "prizes": [
+            {
+                "amount": 5000000,
+                "count": 4
+            },
+            {
+                "amount": 500000,
+                "count": 20
+            },
+            {
+                "amount": 50000,
+                "count": 200
+            },
+            {
+                "amount": 10000,
+                "count": 800
+            },
+            {
+                "amount": 5000,
+                "count": 5000
+            },
+            {
+                "amount": 1000,
+                "count": 60000
+            },
+            {
+                "amount": 500,
+                "count": 1200000
+            },
+            {
+                "amount": 100,
+                "count": 800000
+            }
+        ]
+    },
+    {
+        "id": "2026-lucky-200",
+        "name": "好運連連",
+        "price": 200,
+        "win_rate": 35.0,
+        "top_prize": 2000000,
+        "img_url": "https://images.unsplash.com/photo-1583209814683-c023dd293cc6?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGx1Y2t5fGVufDB8fDB8fHww",
+        "expected_value": 120,
+        "description": "小賭怡情，好運不斷",
+        "total_tickets": 4000000,
+        "total_in_book": 100,
+        "prizes": [
+            {
+                "amount": 2000000,
+                "count": 3
+            },
+            {
+                "amount": 200000,
+                "count": 30
+            },
+            {
+                "amount": 10000,
+                "count": 100
+            },
+            {
+                "amount": 2000,
+                "count": 2000
+            },
+            {
+                "amount": 1000,
+                "count": 10000
+            },
+            {
+                "amount": 500,
+                "count": 80000
+            },
+            {
+                "amount": 200,
+                "count": 1000000
+            }
+        ]
+    },
+    {
+        "id": "2026-happy-100",
+        "name": "歡樂一把抓",
+        "price": 100,
+        "win_rate": 30.0,
+        "top_prize": 300000,
+        "img_url": "https://images.unsplash.com/photo-1606041008023-472dfb5e530f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Z2lmdHxlbnwwfHwwfHx8MA%3D%3D",
+        "expected_value": 55,
+        "description": "百元入門款，隨手刮隨手樂",
+        "total_tickets": 3000000,
+        "total_in_book": 100,
+        "prizes": [
+            {
+                "amount": 300000,
+                "count": 2
+            },
+            {
+                "amount": 10000,
+                "count": 100
+            },
+            {
+                "amount": 5000,
+                "count": 200
+            },
+            {
+                "amount": 1000,
+                "count": 5000
+            },
+            {
+                "amount": 500,
+                "count": 20000
+            },
+            {
+                "amount": 200,
+                "count": 150000
+            },
+            {
+                "amount": 100,
+                "count": 800000
+            }
+        ]
+    }
+]

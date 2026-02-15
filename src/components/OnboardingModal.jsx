@@ -74,9 +74,42 @@ export function OnboardingModal() {
         }
     };
 
+    const handlePrev = () => {
+        if (currentSlide > 0) {
+            setCurrentSlide(curr => curr - 1);
+        }
+    };
+
     const handleClose = () => {
         localStorage.setItem(ONBOARDING_KEY, 'true');
         setIsOpen(false);
+    };
+
+    // Swipe Support
+    const [touchStart, setTouchStart] = useState(null);
+    const [touchEnd, setTouchEnd] = useState(null);
+
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e) => {
+        setTouchEnd(null);
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+
+        if (isLeftSwipe) {
+            handleNext();
+        }
+        if (isRightSwipe) {
+            handlePrev();
+        }
     };
 
     if (!isOpen) return null;
@@ -101,6 +134,9 @@ export function OnboardingModal() {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0, y: 20 }}
                         className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                        onTouchStart={onTouchStart}
+                        onTouchMove={onTouchMove}
+                        onTouchEnd={onTouchEnd}
                     >
                         {/* Header Image/Icon Area */}
                         <div className={`h-32 ${slides[currentSlide].bgColor || 'bg-gray-50'} flex items-center justify-center relative overflow-hidden transition-colors duration-500`}>
@@ -114,9 +150,6 @@ export function OnboardingModal() {
                             >
                                 <CurrentIcon className={`w-16 h-16 ${slides[currentSlide].color}`} />
                             </motion.div>
-
-                            {/* Skip Button */}
-
                         </div>
 
                         {/* Content Area */}
@@ -151,21 +184,31 @@ export function OnboardingModal() {
                                 ))}
                             </div>
 
-                            {/* Action Button */}
-                            <button
-                                onClick={handleNext}
-                                className={`w-full py-3.5 px-6 rounded-xl font-bold text-white shadow-lg transform transition-all active:scale-95 flex items-center justify-center gap-2
-                  ${currentSlide === slides.length - 1
-                                        ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 shadow-orange-200'
-                                        : 'bg-gray-900 hover:bg-black shadow-gray-200'
-                                    }`}
-                            >
-                                {currentSlide === slides.length - 1 ? (
-                                    <>開始探索 <Sparkles className="w-4 h-4" /></>
-                                ) : (
-                                    <>下一步 <ChevronRight className="w-4 h-4" /></>
+                            {/* Action Buttons */}
+                            <div className="flex w-full gap-3">
+                                {currentSlide > 0 && (
+                                    <button
+                                        onClick={handlePrev}
+                                        className="flex-1 py-3.5 px-6 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 shadow-sm transform transition-all active:scale-95 flex items-center justify-center"
+                                    >
+                                        上一步
+                                    </button>
                                 )}
-                            </button>
+                                <button
+                                    onClick={handleNext}
+                                    className={`flex-[2] py-3.5 px-6 rounded-xl font-bold text-white shadow-lg transform transition-all active:scale-95 flex items-center justify-center gap-2
+                  ${currentSlide === slides.length - 1
+                                            ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 shadow-orange-200'
+                                            : 'bg-gray-900 hover:bg-black shadow-gray-200'
+                                        }`}
+                                >
+                                    {currentSlide === slides.length - 1 ? (
+                                        <>開始探索 <Sparkles className="w-4 h-4" /></>
+                                    ) : (
+                                        <>下一步 <ChevronRight className="w-4 h-4" /></>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </motion.div>
                 </div>

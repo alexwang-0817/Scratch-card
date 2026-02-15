@@ -45,7 +45,7 @@ export function StatsOverview({ stats, loading }) {
                     <div className="flex flex-col items-center">
                         <div className="text-gray-400 text-[10px] md:text-xs uppercase tracking-wider mb-1 font-semibold whitespace-nowrap">全台購買張數</div>
                         <div className="text-lg md:text-3xl font-bold text-gray-800">
-                            <StatItem value={stats.totalCount} prefix="總共 " suffix=" 張" />
+                            <StatItem value={stats.totalCount} suffix=" 張" />
                         </div>
                     </div>
 

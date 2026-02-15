@@ -106,7 +106,7 @@ export function PrizeStructureModal({ lottery, stats, isOpen, onClose }) {
                             {/* Fixed Height: h-[85vh] */}
                             <GlassCard whileHover={{}} className="bg-white border-gray-200 shadow-2xl h-[85vh] flex flex-col transform-none">
                                 {/* Header */}
-                                <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4 flex-shrink-0">
+                                <div className="flex items-center justify-between mb-0 border-b border-gray-100 p-4 flex-shrink-0 bg-white z-10 rounded-t-[10px]">
                                     <div className="flex items-center gap-3">
                                         <div className="p-2 bg-yellow-50 rounded-lg">
                                             <Trophy className="w-6 h-6 text-yellow-600" />
@@ -126,164 +126,159 @@ export function PrizeStructureModal({ lottery, stats, isOpen, onClose }) {
                                     </button>
                                 </div>
 
-                                {/* Summary Stats (Always Visible) */}
-                                <div className="grid grid-cols-3 gap-2 mb-4 px-2 flex-shrink-0">
-                                    <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                        <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">中獎總金額</div>
-                                        <div className="text-lg font-bold text-gray-800">${totalWin.toLocaleString()}</div>
-                                    </div>
-                                    <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                        <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">中獎機率</div>
-                                        <div className="text-lg font-bold text-blue-600">{winRate.toFixed(1)}%</div>
-                                    </div>
-                                    <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                        <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">回本率</div>
-                                        <div className={`text-lg font-bold ${roi >= 100 ? 'text-green-600' : roi >= 60 ? 'text-yellow-600' : 'text-red-500'}`}>
-                                            {roi.toFixed(0)}%
+                                {/* Scrollable Content Area */}
+                                <div className="overflow-y-auto flex-1 custom-scrollbar p-4 pt-2">
+
+                                    {/* Summary Stats */}
+                                    <div className="grid grid-cols-3 gap-2 mb-6">
+                                        <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                            <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">中獎總金額</div>
+                                            <div className="text-lg font-bold text-gray-800">${totalWin.toLocaleString()}</div>
+                                        </div>
+                                        <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                            <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">中獎機率</div>
+                                            <div className="text-lg font-bold text-blue-600">{winRate.toFixed(1)}%</div>
+                                        </div>
+                                        <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                            <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">回本率</div>
+                                            <div className={`text-lg font-bold ${roi >= 100 ? 'text-green-600' : roi >= 60 ? 'text-yellow-600' : 'text-red-500'}`}>
+                                                {roi.toFixed(0)}%
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Charts Section */}
-                                <div className="mb-4 bg-gray-50 rounded-xl p-3 flex-shrink-0 border border-gray-100">
-                                    {/* Tabs */}
-                                    <div className="flex bg-gray-200/50 p-1 rounded-lg mb-3">
-                                        <button
-                                            onClick={() => setActiveTab('distribution')}
-                                            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'distribution' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                        >
-                                            中獎金額分佈
-                                        </button>
-                                        <button
-                                            onClick={() => setActiveTab('frequency')}
-                                            className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'frequency' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                        >
-                                            經常中獎編號
-                                        </button>
-                                    </div>
+                                    {/* Charts Section */}
+                                    <div className="mb-6 bg-gray-50 rounded-xl p-3 border border-gray-100">
+                                        {/* Tabs */}
+                                        <div className="flex bg-gray-200/50 p-1 rounded-lg mb-3">
+                                            <button
+                                                onClick={() => setActiveTab('distribution')}
+                                                className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'distribution' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                            >
+                                                中獎金額分佈
+                                            </button>
+                                            <button
+                                                onClick={() => setActiveTab('frequency')}
+                                                className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${activeTab === 'frequency' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                            >
+                                                經常中獎編號
+                                            </button>
+                                        </div>
 
-                                    {/* Chart Content */}
-                                    <div className="h-64 relative flex items-center justify-center">
-                                        {activeTab === 'distribution' ? (
-                                            <div className="relative w-56 h-56">
-                                                {/* Pie Chart (Conic Gradient) */}
-                                                <div className="w-full h-full rounded-full relative"
-                                                    style={{
-                                                        background: Object.values(reportedStats.prizeDist || {}).reduce((a, b) => a + b, 0) > 0
-                                                            ? `conic-gradient(${pieData.reduce((acc, item, idx) => {
-                                                                const prevDeg = idx === 0 ? 0 : acc.currentDeg;
-                                                                const deg = (item.percentage / 100) * 360;
-                                                                const endDeg = prevDeg + deg;
-                                                                acc.stops.push(`${item.color} ${prevDeg}deg ${endDeg}deg`);
-                                                                acc.currentDeg = endDeg;
-                                                                return acc;
-                                                            }, { stops: [], currentDeg: 0 }).stops.join(', ')})`
-                                                            : '#e5e7eb'
-                                                    }}
-                                                >
-                                                    <div className="absolute inset-0 rounded-full"></div>
-                                                </div>
+                                        {/* Chart Content */}
+                                        <div className="h-64 relative flex items-center justify-center">
+                                            {activeTab === 'distribution' ? (
+                                                <div className="relative w-56 h-56">
+                                                    {/* Pie Chart (Conic Gradient) */}
+                                                    <div className="w-full h-full rounded-full relative"
+                                                        style={{
+                                                            background: Object.values(reportedStats.prizeDist || {}).reduce((a, b) => a + b, 0) > 0
+                                                                ? `conic-gradient(${pieData.reduce((acc, item, idx) => {
+                                                                    const prevDeg = idx === 0 ? 0 : acc.currentDeg;
+                                                                    const deg = (item.percentage / 100) * 360;
+                                                                    const endDeg = prevDeg + deg;
+                                                                    acc.stops.push(`${item.color} ${prevDeg}deg ${endDeg}deg`);
+                                                                    acc.currentDeg = endDeg;
+                                                                    return acc;
+                                                                }, { stops: [], currentDeg: 0 }).stops.join(', ')})`
+                                                                : '#e5e7eb'
+                                                        }}
+                                                    >
+                                                        <div className="absolute inset-0 rounded-full"></div>
+                                                    </div>
 
-                                                {/* Labels Overlay */}
-                                                {Object.values(reportedStats.prizeDist || {}).reduce((a, b) => a + b, 0) > 0 && (
-                                                    <div className="absolute inset-0 pointer-events-none">
-                                                        {(() => {
-                                                            let currentAngle = 0;
-                                                            return pieData.map((item, idx) => {
-                                                                if (!item.hasData || item.percentage < 3) {
-                                                                    currentAngle += (item.percentage / 100) * 360;
-                                                                    return null; // Skip small or empty slices
-                                                                }
+                                                    {/* Labels Overlay */}
+                                                    {Object.values(reportedStats.prizeDist || {}).reduce((a, b) => a + b, 0) > 0 && (
+                                                        <div className="absolute inset-0 pointer-events-none">
+                                                            {(() => {
+                                                                let currentAngle = 0;
+                                                                return pieData.map((item, idx) => {
+                                                                    if (!item.hasData || item.percentage < 3) {
+                                                                        currentAngle += (item.percentage / 100) * 360;
+                                                                        return null; // Skip small or empty slices
+                                                                    }
 
-                                                                const sliceAngle = (item.percentage / 100) * 360;
-                                                                const midAngle = currentAngle + sliceAngle / 2;
-                                                                currentAngle += sliceAngle;
+                                                                    const sliceAngle = (item.percentage / 100) * 360;
+                                                                    const midAngle = currentAngle + sliceAngle / 2;
+                                                                    currentAngle += sliceAngle;
 
-                                                                // Convert to Radians (CSS 0deg is -90deg trig)
-                                                                // Formula: rad = (midAngle - 90) * PI / 180
-                                                                const rad = (midAngle - 90) * (Math.PI / 180);
+                                                                    // Convert to Radians (CSS 0deg is -90deg trig)
+                                                                    // Formula: rad = (midAngle - 90) * PI / 180
+                                                                    const rad = (midAngle - 90) * (Math.PI / 180);
 
-                                                                // Position at 65% radius
-                                                                const xPos = 50 + (32 * Math.cos(rad));
-                                                                const yPos = 50 + (32 * Math.sin(rad));
+                                                                    // Position at 65% radius
+                                                                    const xPos = 50 + (32 * Math.cos(rad));
+                                                                    const yPos = 50 + (32 * Math.sin(rad));
 
-                                                                return (
-                                                                    <div
-                                                                        key={idx}
-                                                                        className="absolute flex flex-col items-center justify-center text-center transform -translate-x-1/2 -translate-y-1/2"
-                                                                        style={{ left: `${xPos}%`, top: `${yPos}%` }}
-                                                                    >
-                                                                        <span className="text-[10px] font-bold text-white drop-shadow-md whitespace-nowrap px-1 py-0.5 rounded bg-black/20 backdrop-blur-[1px]">
-                                                                            {item.amount === 0 ? '未中' : `$${item.amount}`}
-                                                                        </span>
-                                                                        {item.percentage > 10 && (
-                                                                            <span className="text-[9px] text-white/90 drop-shadow-md">
-                                                                                {item.percentage.toFixed(0)}%
+                                                                    return (
+                                                                        <div
+                                                                            key={idx}
+                                                                            className="absolute flex flex-col items-center justify-center text-center transform -translate-x-1/2 -translate-y-1/2"
+                                                                            style={{ left: `${xPos}%`, top: `${yPos}%` }}
+                                                                        >
+                                                                            <span className="text-[10px] font-bold text-white drop-shadow-md whitespace-nowrap px-1 py-0.5 rounded bg-black/20 backdrop-blur-[1px]">
+                                                                                {item.amount === 0 ? '未中' : `$${item.amount}`}
                                                                             </span>
-                                                                        )}
-                                                                    </div>
-                                                                );
-                                                            });
-                                                        })()}
-                                                    </div>
-                                                )}
-
-                                                {/* Empty State Label */}
-                                                {Object.values(reportedStats.prizeDist || {}).reduce((a, b) => a + b, 0) === 0 && (
-                                                    <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs font-bold">
-                                                        尚無數據
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div className="h-full w-full flex items-end justify-between gap-1 px-1">
-                                                {barData.map((item, idx) => {
-                                                    const maxCount = Math.max(...barData.filter(d => !d.isPlaceholder).map(d => d.count)) || 1;
-                                                    // Max bar height is 50% of container
-                                                    const heightPercent = item.isPlaceholder ? 0 : (item.count / maxCount) * 50;
-
-                                                    return (
-                                                        <div key={idx} className="flex flex-col items-center flex-1 h-full justify-end group relative">
-                                                            {/* Tooltip */}
-                                                            {!item.isPlaceholder && (
-                                                                <div className="absolute -top-8 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                                                    {item.count}次
-                                                                </div>
-                                                            )}
-
-                                                            {/* Label for count (Optional, if users want to see numbers without hover) */}
-                                                            {!item.isPlaceholder && (
-                                                                <div className="text-[10px] text-gray-500 font-bold mb-0.5">{item.count}</div>
-                                                            )}
-
-                                                            {/* Bar Container? No, direct bar. */}
-                                                            {/* If placeholder, show a small generic height track or just the label?
-                                                                User said "Grey bar for default".
-                                                                I'll give placeholders a fixed visual height like 2px or 5% to show presence.
-                                                                "預設" usually implies a slot.
-                                                            */}
-                                                            <div
-                                                                className={`w-full rounded-t-sm transition-all relative ${item.isPlaceholder ? 'bg-gray-200' : 'bg-blue-500 hover:bg-blue-600'}`}
-                                                                style={{
-                                                                    height: item.isPlaceholder ? '4px' : `${heightPercent}%`,
-                                                                    minHeight: '4px'
-                                                                }}
-                                                            ></div>
-
-                                                            {/* Label */}
-                                                            <div className="text-[10px] text-gray-400 mt-1 font-mono text-center w-full truncate border-t border-transparent pt-1">
-                                                                {item.ticketNo}
-                                                            </div>
+                                                                            {item.percentage > 10 && (
+                                                                                <span className="text-[9px] text-white/90 drop-shadow-md">
+                                                                                    {item.percentage.toFixed(0)}%
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    );
+                                                                });
+                                                            })()}
                                                         </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                                                    )}
 
-                                {/* Content - Scrollable Tables */}
-                                <div className="overflow-y-auto pr-2 custom-scrollbar flex-1 min-h-0">
+                                                    {/* Empty State Label */}
+                                                    {Object.values(reportedStats.prizeDist || {}).reduce((a, b) => a + b, 0) === 0 && (
+                                                        <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs font-bold">
+                                                            尚無數據
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="h-full w-full flex items-end justify-between gap-1 px-1">
+                                                    {barData.map((item, idx) => {
+                                                        const maxCount = Math.max(...barData.filter(d => !d.isPlaceholder).map(d => d.count)) || 1;
+                                                        // Max bar height is 50% of container
+                                                        const heightPercent = item.isPlaceholder ? 0 : (item.count / maxCount) * 50;
+
+                                                        return (
+                                                            <div key={idx} className="flex flex-col items-center flex-1 h-full justify-end group relative">
+                                                                {/* Tooltip */}
+                                                                {!item.isPlaceholder && (
+                                                                    <div className="absolute -top-8 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                                                                        {item.count}次
+                                                                    </div>
+                                                                )}
+
+                                                                {/* Label for count (Optional, if users want to see numbers without hover) */}
+                                                                {!item.isPlaceholder && (
+                                                                    <div className="text-[10px] text-gray-500 font-bold mb-0.5">{item.count}</div>
+                                                                )}
+
+                                                                {/* Bar */}
+                                                                <div
+                                                                    className={`w-full rounded-t-sm transition-all relative ${item.isPlaceholder ? 'bg-gray-200' : 'bg-blue-500 hover:bg-blue-600'}`}
+                                                                    style={{
+                                                                        height: item.isPlaceholder ? '4px' : `${heightPercent}%`,
+                                                                        minHeight: '4px'
+                                                                    }}
+                                                                ></div>
+
+                                                                {/* Label */}
+                                                                <div className="text-[10px] text-gray-400 mt-1 font-mono text-center w-full truncate border-t border-transparent pt-1">
+                                                                    {item.ticketNo}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
 
                                     {/* Table 1: Real Stats */}
                                     <div className="mb-4 border border-gray-100 rounded-xl overflow-hidden">
@@ -308,9 +303,6 @@ export function PrizeStructureModal({ lottery, stats, isOpen, onClose }) {
                                                         {lottery.prizes && lottery.prizes.length > 0 ? (
                                                             lottery.prizes.map((prize, idx) => {
                                                                 const count = reportedStats.prizeDist ? (reportedStats.prizeDist[prize.amount] || 0) : 0;
-                                                                // Also check 0 amount manually if it's not in prizes list but we want to show it?
-                                                                // Usually lottery.prizes only lists winning amounts.
-                                                                // We can add a row for "Miss" ($0) if we want, but table usually shows Winners.
                                                                 const probability = reportedStats.count > 0 ? (count / reportedStats.count) * 100 : 0;
                                                                 return (
                                                                     <tr key={idx} className="hover:bg-gray-50 transition-colors">

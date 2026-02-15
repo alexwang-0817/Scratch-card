@@ -195,8 +195,8 @@ export function SubmissionForm({ onSubmit, loading }) {
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             className="fixed inset-0 flex items-center justify-center z-[70] p-4 pointer-events-none"
                         >
-                            <div className="w-full max-w-lg pointer-events-auto flex flex-col max-h-[90vh] h-full">
-                                <div className="bg-gray-100 rounded-2xl shadow-2xl flex flex-col overflow-hidden h-full w-full">
+                            <div className={`w-full max-w-lg pointer-events-auto flex flex-col max-h-[90vh] ${submitted ? 'h-auto' : 'h-full'}`}>
+                                <div className={`bg-gray-100 rounded-2xl shadow-2xl flex flex-col overflow-hidden w-full ${submitted ? 'h-auto' : 'h-full'}`}>
 
                                     {/* Modal Header */}
                                     <div className="p-4 bg-white border-b border-gray-200 flex justify-between items-center flex-shrink-0 z-20 relative">
@@ -230,7 +230,7 @@ export function SubmissionForm({ onSubmit, loading }) {
                                                                 <Check className="w-8 h-8" />
                                                             </div>
                                                             <h3 className="text-xl font-bold text-gray-800 mb-2">感謝回報！</h3>
-                                                            <p className="text-gray-500">祝您蛇年行大運，發大財！</p>
+                                                            <p className="text-gray-500">祝您馬年行大運，發大財！</p>
                                                         </motion.div>
                                                     </GlassCard>
                                                 ) : (
@@ -298,11 +298,14 @@ export function SubmissionForm({ onSubmit, loading }) {
 
                                                         {/* Form Block */}
                                                         <GlassCard whileHover={{}} className="w-full relative bg-white border border-gray-200 shadow-sm overflow-hidden">
-                                                            <h2 className="text-xl font-bold mb-4 text-center text-gray-800 flex items-center justify-center gap-2">
-                                                                <Sparkles className="w-5 h-5 text-yellow-500 animate-pulse" />
-                                                                戰績細節
-                                                                <Sparkles className="w-5 h-5 text-yellow-500 animate-pulse" />
-                                                            </h2>
+                                                            <div className="mb-4 text-center">
+                                                                <h2 className="text-xl font-bold text-gray-800">
+                                                                    戰績細節
+                                                                </h2>
+                                                                <p className="text-xs text-gray-500 mt-1">
+                                                                    沒中的話不要氣餒！更要回報讓大家知道真實機率
+                                                                </p>
+                                                            </div>
 
                                                             {/* Entries List */}
                                                             <div className="space-y-4 mb-4">

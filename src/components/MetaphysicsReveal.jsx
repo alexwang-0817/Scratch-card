@@ -15,12 +15,7 @@ export function MetaphysicsReveal({ stats }) {
     const { metaphysics } = stats;
     const [selectedDetails, setSelectedDetails] = useState(null);
 
-    // If data is not ready yet, don't crash but show empty or loading? 
-    // The previous check handles returning null if empty.
-    if (!metaphysics || (metaphysics.topProfitable.length === 0 && metaphysics.topCP.length === 0)) {
-        return null; // Or return simplified loading state?
-        // Keep original behavior: return null if no data
-    }
+    // Data check removed to allow rendering "No Data" state
 
     const handleOpen = (categoryKey, title, type) => {
         let items = [];
@@ -39,57 +34,60 @@ export function MetaphysicsReveal({ stats }) {
 
     return (
         <>
-            <GlassCard whileHover={{}} className="mt-8 p-6 bg-white/80 backdrop-blur-md border border-purple-200/50 shadow-xl relative overflow-hidden w-full">
-                <h3 className="text-xl font-black text-purple-900 mb-6 flex items-center gap-2 relative z-10">
-                    玄學開獎
-                </h3>
+            <div className="relative group rounded-xl p-[2px] overflow-hidden mt-8 w-full shadow-xl bg-white/20">
+                <div className="absolute inset-[-200%] animate-[spin-slow_8s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_300deg,#f9a8d4_320deg,#d8b4fe_340deg,#93c5fd_360deg)] opacity-70"></div>
+                <GlassCard whileHover={{}} className="p-6 bg-white/95 backdrop-blur-md relative overflow-hidden w-full h-full rounded-[10px]">
+                    <h3 className="text-xl font-black text-purple-900 mb-6 flex items-center gap-2 relative z-10">
+                        玄學開獎
+                    </h3>
 
-                {/* Grid Layout: Mobile 2 cols, Desktop 1 col */}
-                <div className="grid grid-cols-1 gap-4 relative z-10">
+                    {/* Grid Layout: Mobile 2 cols, Desktop 1 col */}
+                    <div className="grid grid-cols-1 gap-4 relative z-10">
 
-                    {/* Helper for rendering ranking list with emphasis on 1st place */}
-                    {renderCategoryBlock(
-                        metaphysics.topProfitable,
-                        "最賺號碼",
-                        DollarSign,
-                        "from-yellow-50 to-orange-50", "border-orange-100", "text-orange-800", "bg-orange-500", "bg-orange-100", "text-red-600",
-                        false, false, false,
-                        () => handleOpen('topProfitable', "最賺號碼", 'profitable')
-                    )}
+                        {/* Helper for rendering ranking list with emphasis on 1st place */}
+                        {renderCategoryBlock(
+                            metaphysics.topProfitable,
+                            "最賺號碼",
+                            DollarSign,
+                            "from-yellow-50 to-orange-50", "border-orange-100", "text-orange-800", "bg-orange-500", "bg-orange-100", "text-red-600",
+                            false, false, false,
+                            () => handleOpen('topProfitable', "最賺號碼", 'profitable')
+                        )}
 
-                    {renderCategoryBlock(
-                        metaphysics.topCP,
-                        "CP值之王",
-                        TrendingUp,
-                        "from-purple-50 to-pink-50", "border-purple-100", "text-purple-800", "bg-purple-500", "bg-purple-100", "text-gray-800",
-                        true, false, false,
-                        () => handleOpen('topCP', "CP值之王", 'cp')
-                    )}
+                        {renderCategoryBlock(
+                            metaphysics.topCP,
+                            "CP值之王",
+                            TrendingUp,
+                            "from-purple-50 to-pink-50", "border-purple-100", "text-purple-800", "bg-purple-500", "bg-purple-100", "text-gray-800",
+                            true, false, false,
+                            () => handleOpen('topCP', "CP值之王", 'cp')
+                        )}
 
-                    {renderCategoryBlock(
-                        metaphysics.topLotteries,
-                        "最賺款式",
-                        Trophy,
-                        "from-blue-50 to-cyan-50", "border-blue-100", "text-blue-800", "bg-blue-500", "bg-blue-100", "text-green-600",
-                        true, true, false,
-                        () => handleOpen('topLotteries', "最賺款式", 'lottery')
-                    )}
+                        {renderCategoryBlock(
+                            metaphysics.topLotteries,
+                            "最賺款式",
+                            Trophy,
+                            "from-blue-50 to-cyan-50", "border-blue-100", "text-blue-800", "bg-blue-500", "bg-blue-100", "text-green-600",
+                            true, true, false,
+                            () => handleOpen('topLotteries', "最賺款式", 'lottery')
+                        )}
 
-                    {renderCategoryBlock(
-                        metaphysics.topRegions,
-                        "最賺地區",
-                        MapPin,
-                        "from-green-50 to-emerald-50", "border-green-100", "text-green-800", "bg-green-500", "bg-green-100", "text-red-600",
-                        false, false, true,
-                        () => handleOpen('topRegions', "最賺地區", 'region')
-                    )}
+                        {renderCategoryBlock(
+                            metaphysics.topRegions,
+                            "最賺地區",
+                            MapPin,
+                            "from-green-50 to-emerald-50", "border-green-100", "text-green-800", "bg-green-500", "bg-green-100", "text-red-600",
+                            false, false, true,
+                            () => handleOpen('topRegions', "最賺地區", 'region')
+                        )}
 
-                </div>
+                    </div>
 
-                <p className="text-[10px] text-gray-400 mt-4 text-center">
-                    * 點擊各區塊可查看完整排名及統計說明。
-                </p>
-            </GlassCard>
+                    <p className="text-[10px] text-gray-400 mt-4 text-center">
+                        * 點擊各區塊可查看完整排名及統計說明。
+                    </p>
+                </GlassCard >
+            </div >
 
             <MetaphysicsModal
                 isOpen={!!selectedDetails}

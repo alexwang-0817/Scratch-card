@@ -23,6 +23,17 @@ function App() {
         </div>
       )}
 
+      {/* Yellow Background Block with Marquee */}
+      <div className="absolute top-0 left-0 w-full h-[45vh] bg-yellow-500 z-0 overflow-hidden flex items-center justify-center">
+        <div className="flex animate-marquee whitespace-nowrap items-center will-change-transform">
+          {Array(20).fill("馬年恭喜 發大財").map((text, i) => (
+            <span key={i} className="text-white/40 font-black text-[35vh] leading-none mx-20 inline-block select-none">
+              {text}
+            </span>
+          ))}
+        </div>
+      </div>
+
       <div className="container mx-auto px-4 py-8 relative z-10 max-w-6xl">
 
         {/* Header / Hero */}

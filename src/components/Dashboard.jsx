@@ -25,15 +25,16 @@ export function Dashboard({ stats, loading }) {
 
                 <div className="grid grid-cols-1 gap-4">
                     {mockLotteries.map((l, index) => {
-                        const lStat = stats.lotteryStats[l.id] || { count: 0, win: 0, reports: 0 };
+                        const lStat = stats.lotteryStats[l.id] || { count: 0, win: 0, reports: 0, winCount: 0 };
                         const spent = lStat.count * l.price;
-                        const lRoi = spent > 0 ? (lStat.win / spent) * 100 : 0;
+                        // const lRoi = spent > 0 ? (lStat.win / spent) * 100 : 0; // Deprecated
+                        const lWinRate = lStat.count > 0 ? (lStat.winCount / lStat.count) * 100 : 0;
 
                         return (
-                            <GlassCard
+                            <div
                                 key={l.id}
                                 onClick={() => setSelectedLottery(l)}
-                                className="p-4 flex flex-col md:flex-row items-center gap-4 hover:shadow-lg hover:border-yellow-200 transition-all bg-white border-gray-100 cursor-pointer group"
+                                className="p-4 flex flex-row items-center gap-4 hover:shadow-lg hover:border-yellow-200 transition-all bg-white border border-gray-100 rounded-xl cursor-pointer group"
                             >
                                 {/* Image */}
                                 <div className="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 shadow-inner group-hover:scale-105 transition-transform duration-300">
@@ -41,29 +42,29 @@ export function Dashboard({ stats, loading }) {
                                 </div>
 
                                 {/* Info */}
-                                <div className="flex-grow text-center md:text-left">
+                                <div className="flex-grow text-left">
                                     <h4 className="font-bold text-lg text-gray-800 relative inline-flex items-center gap-2 group-hover:text-yellow-600 transition-colors">
                                         {l.name}
                                         <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200 group-hover:border-yellow-100 group-hover:bg-yellow-50">${l.price}</span>
                                     </h4>
-                                    <div className="text-sm text-gray-500 mt-1 flex flex-wrap justify-center md:justify-start gap-3">
+                                    <div className="text-sm text-gray-500 mt-1 flex flex-wrap justify-start gap-3">
                                         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-400"></span> 回報人數: {lStat.reports}</span>
                                         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-400"></span> 總張數: {lStat.count}</span>
                                     </div>
                                 </div>
 
                                 {/* Stats */}
-                                <div className="flex flex-col items-center md:items-end min-w-[120px] bg-gray-50 p-3 rounded-lg group-hover:bg-yellow-50/30 transition-colors">
-                                    <div className="text-xs text-gray-400 uppercase tracking-widest mb-1 font-semibold group-hover:text-yellow-600/70">回本率</div>
-                                    <div className={`text-2xl font-black ${lRoi > 70 ? 'text-green-600' : lRoi > 50 ? 'text-yellow-600' : 'text-red-500'}`}>
-                                        {lRoi.toFixed(1)}%
+                                <div className="flex flex-col items-end min-w-[80px] md:min-w-[120px] bg-gray-50 p-2 md:p-3 rounded-lg group-hover:bg-yellow-50/30 transition-colors">
+                                    <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-widest mb-1 font-semibold group-hover:text-yellow-600/70">中獎率</div>
+                                    <div className={`text-xl md:text-2xl font-black ${lWinRate > 50 ? 'text-green-600' : lWinRate > 30 ? 'text-yellow-600' : 'text-red-500'}`}>
+                                        {lWinRate.toFixed(1)}%
                                     </div>
-                                    <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                                        預期: {((l.expected_value / l.price) * 100).toFixed(0)}%
-                                        <ChevronRight className="w-3 h-3 text-gray-300 group-hover:text-yellow-400 opacity-0 group-hover:opacity-100 transition-all -mr-2" />
+                                    <div className="text-[10px] md:text-xs text-gray-400 mt-1 flex items-center gap-1 whitespace-nowrap">
+                                        官方: {l.win_rate}%
+                                        <ChevronRight className="w-3 h-3 text-gray-300 group-hover:text-yellow-400 opacity-0 group-hover:opacity-100 transition-all -mr-2 hidden md:block" />
                                     </div>
                                 </div>
-                            </GlassCard>
+                            </div>
                         );
                     })}
                 </div>

@@ -8,6 +8,18 @@ export function PrizeStructureModal({ lottery, stats, isOpen, onClose }) {
     const [showReal, setShowReal] = useState(true);
     const [showOfficial, setShowOfficial] = useState(false);
 
+    // Lock body scroll when modal is open
+    React.useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
+
     if (!lottery) return null;
 
     // Use reported stats or default to 0
@@ -38,7 +50,7 @@ export function PrizeStructureModal({ lottery, stats, isOpen, onClose }) {
                         className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none"
                     >
                         <div className="w-full max-w-lg pointer-events-auto">
-                            <GlassCard className="bg-white border-gray-200 shadow-2xl max-h-[85vh] flex flex-col">
+                            <GlassCard whileHover={{}} className="bg-white border-gray-200 shadow-2xl max-h-[85vh] flex flex-col transform-none">
                                 {/* Header */}
                                 <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4 flex-shrink-0">
                                     <div className="flex items-center gap-3">

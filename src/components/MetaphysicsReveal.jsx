@@ -45,7 +45,7 @@ export function MetaphysicsReveal({ stats }) {
                 </h3>
 
                 {/* Grid Layout: Mobile 2 cols, Desktop 1 col */}
-                <div className="grid grid-cols-2 md:grid-cols-1 gap-4 relative z-10">
+                <div className="grid grid-cols-1 gap-4 relative z-10">
 
                     {/* Helper for rendering ranking list with emphasis on 1st place */}
                     {renderCategoryBlock(
@@ -182,7 +182,7 @@ function renderCategoryBlock(
                                 {isLottery ? item.name : (isRegion ? item.location : `#${item.ticketNo}`)}
                             </span>
                         </div>
-                        <span className={`font-bold ${valueColor} flex-shrink-0`}>
+                        <span className="font-bold text-gray-500 flex-shrink-0">
                             {isPercent ? `${item.roi.toFixed(0)}%` : `$${item.totalWin ? item.totalWin.toLocaleString() : (item.win ? item.win.toLocaleString() : 0)}`}
                         </span>
                     </div>

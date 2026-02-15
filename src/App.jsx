@@ -7,13 +7,14 @@ import { motion } from 'framer-motion';
 import { Sparkles, Trophy } from 'lucide-react';
 import { StatsOverview } from './components/StatsOverview';
 
+import { OnboardingModal } from './components/OnboardingModal';
+
 function App() {
   const { stats, submitData, loading, error } = useScratchStats();
 
-
-
   return (
     <div className="min-h-screen relative overflow-hidden text-gray-900 font-sans bg-gray-50 pb-20">
+      <OnboardingModal />
 
       {/* Error Banner */}
       {error && (

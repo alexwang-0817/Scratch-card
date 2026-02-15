@@ -3,7 +3,7 @@ import { GlassCard } from './GlassCard';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Loader2, Sparkles, Coins, X, ChevronDown, ChevronUp, Plus, Trash2, Trophy } from 'lucide-react';
-import mockLotteries from '../data/mockLotteries.json';
+import mockLotteries from '../data/lotteries';
 
 export function SubmissionForm({ onSubmit, loading }) {
     // Structure: [{ id, lotteryId, expanded, items: [{ id, ticketNo: '', winAmount: '' }] }]

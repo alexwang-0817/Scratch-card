@@ -2,7 +2,7 @@
 import React from 'react';
 import { StatItem } from './StatItem';
 import { GlassCard } from './GlassCard';
-import mockLotteries from '../data/mockLotteries.json';
+import mockLotteries from '../data/lotteries';
 import { motion } from 'framer-motion';
 
 export function StatsOverview({ stats, loading }) {

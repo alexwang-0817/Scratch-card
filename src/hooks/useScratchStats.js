@@ -10,7 +10,7 @@ import {
 } from 'firebase/firestore';
 import { signInAnonymously } from 'firebase/auth';
 import { db, auth } from '../lib/firebase';
-import mockLotteries from '../data/mockLotteries.json'; // Import mockLotteries
+import mockLotteries from '../data/lotteries'; // Import lotteries.js
 
 export function useScratchStats() {
     const [stats, setStats] = useState({

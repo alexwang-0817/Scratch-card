@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StatItem } from './StatItem';
 import { GlassCard } from './GlassCard';
-import mockLotteries from '../data/mockLotteries.json';
+import mockLotteries from '../data/lotteries';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PrizeStructureModal } from './PrizeStructureModal';
 import { ChevronRight } from 'lucide-react';

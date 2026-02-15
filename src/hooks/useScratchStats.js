@@ -51,8 +51,13 @@ export function useScratchStats() {
             let tc = 0;
             let tw = 0;
             const ls = {};
+            const lsPast = {}; // Past stats for Lottery Types
             const ticketMap = {}; // Map for ticket statistics
+            const ticketMapPast = {}; // Past stats for Ticket Numbers
             const regionMap = {}; // Map for region statistics
+
+            const now = Date.now();
+            const oneDayAgo = now - (24 * 60 * 60 * 1000);
 
             snapshot.forEach((doc) => {
                 const data = doc.data();
@@ -62,33 +67,48 @@ export function useScratchStats() {
                 const location = data.location;
                 const lotteryId = data.lottery_id;
 
+                // Handle timestamp (estimate if null for local pending writes)
+                const docTime = data.timestamp ? data.timestamp.toMillis() : now;
+                const isPast = docTime < oneDayAgo;
+
                 tc += count;
                 tw += dist;
 
-                // Existing lottery stats logic (Enhanced for "Most Profitable Lottery Type")
+                // --- Lottery Stats (Current & Past) ---
                 if (!ls[lotteryId]) {
                     const lottery = mockLotteries.find(l => l.id === lotteryId);
-                    const price = lottery ? lottery.price : 0;
                     ls[lotteryId] = {
                         id: lotteryId,
                         name: lottery ? lottery.name : lotteryId,
-                        count: 0,
-                        win: 0,
-                        spent: 0,
-                        reports: 0
+                        count: 0, win: 0, spent: 0, reports: 0
                     };
                 }
-                // Get price each time in case it changes, but usually static. Better to get from ls if set.
-                // For simple accumulation:
+                if (isPast && !lsPast[lotteryId]) {
+                    const lottery = mockLotteries.find(l => l.id === lotteryId);
+                    lsPast[lotteryId] = {
+                        id: lotteryId,
+                        count: 0, win: 0, spent: 0
+                    };
+                }
+
+                // Get price
                 const lottery = mockLotteries.find(l => l.id === lotteryId);
                 const price = lottery ? lottery.price : 0;
 
+                // Update Current Lottery Stats
                 ls[lotteryId].count += count;
                 ls[lotteryId].win += dist;
                 ls[lotteryId].spent += (price * count);
                 ls[lotteryId].reports += 1;
 
-                // New Metaphysics Logic (Ticket Statistics)
+                // Update Past Lottery Stats
+                if (isPast) {
+                    lsPast[lotteryId].count += count;
+                    lsPast[lotteryId].win += dist;
+                    lsPast[lotteryId].spent += (price * count);
+                }
+
+                // --- Ticket Number Stats (Current & Past) ---
                 if (ticketNo) {
                     if (!ticketMap[ticketNo]) {
                         ticketMap[ticketNo] = { ticketNo, totalWin: 0, totalSpent: 0, count: 0 };
@@ -96,9 +116,18 @@ export function useScratchStats() {
                     ticketMap[ticketNo].totalWin += dist;
                     ticketMap[ticketNo].totalSpent += (price * count);
                     ticketMap[ticketNo].count += count;
+
+                    if (isPast) {
+                        if (!ticketMapPast[ticketNo]) {
+                            ticketMapPast[ticketNo] = { ticketNo, totalWin: 0, totalSpent: 0, count: 0 };
+                        }
+                        ticketMapPast[ticketNo].totalWin += dist;
+                        ticketMapPast[ticketNo].totalSpent += (price * count);
+                        ticketMapPast[ticketNo].count += count;
+                    }
                 }
 
-                // Region Statistics
+                // --- Region Stats (Current only for now) ---
                 if (location) {
                     if (!regionMap[location]) {
                         regionMap[location] = { location, totalWin: 0, totalSpent: 0 };
@@ -108,32 +137,106 @@ export function useScratchStats() {
                 }
             });
 
+            // --- Helper to calculate rankings ---
+            const getRankMap = (items, sortFn) => {
+                const sorted = [...items].sort(sortFn);
+                const rankMap = new Map();
+                sorted.forEach((item, index) => {
+                    // Use unique ID (ticketNo or id)
+                    rankMap.set(item.ticketNo || item.id, index + 1);
+                });
+                return rankMap;
+            };
+
             // Calculate Metaphysics Results
             const ticketArray = Object.values(ticketMap);
+            const ticketArrayPast = Object.values(ticketMapPast);
 
-            // 1. Top Profitable Numbers (Total Win Amount)
+            const lsArray = Object.values(ls);
+            const lsArrayPast = Object.values(lsPast);
+
+            // 1. Top Profitable Numbers (Trend Calculation)
+            const sortProfitable = (a, b) => b.totalWin - a.totalWin;
+            const pastRankProfitable = getRankMap(ticketArrayPast, sortProfitable);
+
             const topProfitable = [...ticketArray]
-                .sort((a, b) => b.totalWin - a.totalWin)
-                .slice(0, 3);
+                .sort(sortProfitable)
+                .slice(0, 3)
+                .map((item, index) => {
+                    const currentRank = index + 1;
+                    const pastRank = pastRankProfitable.get(item.ticketNo);
+                    let trend = 0; // 0 = same, >0 = up, <0 = down. 
+                    // Wait, usually Trend + means Position Improved (Rank number decreased).
+                    // e.g. Rank 5 -> Rank 1. Diff is 4.
+                    // So Trend = PastRank - CurrentRank.
+                    if (pastRank) {
+                        trend = pastRank - currentRank;
+                    } else {
+                        trend = 999; // New/Skyrocketed
+                    }
+                    return { ...item, trend };
+                });
 
-            // 2. Best CP Numbers (ROI)
+
+            // 2. Best CP Numbers (Trend)
+            const sortCP = (a, b) => {
+                const roiA = a.totalSpent > 0 ? (a.totalWin / a.totalSpent) : 0;
+                const roiB = b.totalSpent > 0 ? (b.totalWin / b.totalSpent) : 0;
+                return roiB - roiA;
+            };
+            // Note: ticketArrayPast items need 'roi' calculated for sorting? No, sort logic handles it?
+            // sortCP calculates ROI inline.
+            // But ticketArray items in `topCP` need ROI property for display?
+            // The previous logic added `roi` property.
+
+            const pastRankCP = getRankMap(ticketArrayPast, sortCP);
+
             const topCP = [...ticketArray]
                 .filter(t => t.totalSpent > 0)
                 .map(t => ({ ...t, roi: (t.totalWin / t.totalSpent) * 100 }))
-                .sort((a, b) => b.roi - a.roi)
-                .slice(0, 3);
+                .sort((a, b) => b.roi - a.roi) // Sort using pre-calculated ROI to match display
+                .slice(0, 3)
+                .map((item, index) => {
+                    const currentRank = index + 1;
+                    const pastRank = pastRankCP.get(item.ticketNo);
+                    let trend = 0;
+                    if (pastRank) {
+                        trend = pastRank - currentRank;
+                    } else {
+                        trend = 999;
+                    }
+                    return { ...item, trend };
+                });
 
-            // 3. Top Profitable Lotteries
-            const topLotteries = Object.values(ls)
+            // 3. Top Profitable Lotteries (Trend)
+            const sortLotteryROI = (a, b) => {
+                const roiA = a.spent > 0 ? (a.win / a.spent) : 0;
+                const roiB = b.spent > 0 ? (b.win / b.spent) : 0;
+                return roiB - roiA;
+            };
+            const pastRankLottery = getRankMap(lsArrayPast, sortLotteryROI);
+
+            const topLotteries = lsArray
                 .filter(l => l.spent > 0)
                 .map(l => ({
                     ...l,
                     roi: (l.win / l.spent) * 100
                 }))
-                .sort((a, b) => b.roi - a.roi) // Sort by ROI? User asked for "Most Profitable Type: count, win, roi". Usually sort by ROI or Win? Let's sort by ROI for "Most Profitable" in context of gambling, or total Win? "最賺" usually means Net Profit or ROI. Let's use ROI as primary sort, but show all stats.
-                .slice(0, 3);
+                .sort((a, b) => b.roi - a.roi)
+                .slice(0, 3)
+                .map((item, index) => {
+                    const currentRank = index + 1;
+                    const pastRank = pastRankLottery.get(item.id);
+                    let trend = 0;
+                    if (pastRank) {
+                        trend = pastRank - currentRank;
+                    } else {
+                        trend = 999;
+                    }
+                    return { ...item, trend };
+                });
 
-            // 4. Top Regions (Total Win Amount)
+            // 4. Top Regions (No Trend required per user request "Number and Type", but harmless? Leave out for simplicity)
             const topRegions = Object.values(regionMap)
                 .sort((a, b) => b.totalWin - a.totalWin)
                 .slice(0, 3);

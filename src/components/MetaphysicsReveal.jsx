@@ -1,6 +1,6 @@
 import React from 'react';
 import { GlassCard } from './GlassCard';
-import { Sparkles, TrendingUp, DollarSign, Trophy, MapPin } from 'lucide-react';
+import { Sparkles, TrendingUp, DollarSign, Trophy, MapPin, TrendingDown, Minus, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function MetaphysicsReveal({ stats }) {
@@ -11,136 +11,34 @@ export function MetaphysicsReveal({ stats }) {
     }
 
     return (
-        <GlassCard className="mt-8 p-6 bg-white/80 backdrop-blur-md border border-purple-200/50 shadow-xl relative overflow-hidden">
-            {/* Background Decoration */}
-            <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-                <Sparkles className="w-24 h-24 text-purple-600" />
-            </div>
-
+        <GlassCard whileHover={{}} className="mt-8 p-6 bg-white/80 backdrop-blur-md border border-purple-200/50 shadow-xl relative overflow-hidden w-full">
             <h3 className="text-xl font-black text-purple-900 mb-6 flex items-center gap-2 relative z-10">
-                <Sparkles className="w-6 h-6 text-purple-600 animate-pulse" />
                 玄學開獎
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-                {/* 1. Most Profitable Numbers */}
-                <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-4 border border-orange-100">
-                    <h4 className="font-bold text-orange-800 mb-3 flex items-center gap-2">
-                        <DollarSign className="w-5 h-5" />
-                        最賺號碼 (前三名)
-                    </h4>
-                    <div className="space-y-2">
-                        {metaphysics.topProfitable.map((item, index) => (
-                            <div key={index} className="flex justify-between items-center bg-white/60 rounded-lg p-2 border border-orange-100/50">
-                                <div className="flex items-center gap-3">
-                                    <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${index === 0 ? 'bg-orange-500 text-white' : 'bg-orange-200 text-orange-800'}`}>
-                                        {index + 1}
-                                    </span>
-                                    <span className="font-mono font-bold text-gray-800 text-lg">#{item.ticketNo}</span>
-                                </div>
-                                <span className="font-bold text-red-600">
-                                    ${item.totalWin.toLocaleString()}
-                                </span>
-                            </div>
-                        ))}
-                        {metaphysics.topProfitable.length === 0 && (
-                            <p className="text-sm text-gray-400 text-center py-2">尚無數據</p>
-                        )}
-                    </div>
-                </div>
+            {/* Grid Layout: Mobile 2 cols, Desktop 1 col (because sidebar is narrow) or 2 cols if space permits. 
+                User asked for "side by side on mobile". 
+                I will use grid-cols-2 on mobile. 
+                On desktop, the sidebar is narrow (col-span-4 out of 12). 2 cols might be too squeezed. 
+                But user complained about text overflow. 
+                So 1 col on desktop might be safer? 
+                Or user wants the *card itself* to be wider. 
+                I will stick to grid-cols-2 for mobile, and grid-cols-1 for desktop to give more space for text, 
+                OR grid-cols-2 but carefully styled.
+                Actually, "兩組、兩組統計資料並排" refers to the 4 categories (Profit, CP, Type, Region).
+                So the *sections* should be 2x2 on mobile.
+            */}
+            <div className="grid grid-cols-2 md:grid-cols-1 gap-4 relative z-10">
 
-                {/* 2. Best CP Numbers */}
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-100">
-                    <h4 className="font-bold text-purple-800 mb-3 flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5" />
-                        CP值之王 (回報率)
-                    </h4>
-                    <div className="space-y-2">
-                        {metaphysics.topCP.map((item, index) => (
-                            <div key={index} className="flex justify-between items-center bg-white/60 rounded-lg p-2 border border-purple-100/50">
-                                <div className="flex items-center gap-3">
-                                    <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${index === 0 ? 'bg-purple-500 text-white' : 'bg-purple-200 text-purple-800'}`}>
-                                        {index + 1}
-                                    </span>
-                                    <span className="font-mono font-bold text-gray-800 text-lg">#{item.ticketNo}</span>
-                                </div>
-                                <div className="text-right">
-                                    <span className={`block font-bold ${item.roi >= 100 ? 'text-green-600' : 'text-gray-600'}`}>
-                                        {item.roi.toFixed(0)}%
-                                    </span>
-                                    <span className="text-[10px] text-gray-400 block -mt-1">
-                                        (樣本:{item.count})
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                        {metaphysics.topCP.length === 0 && (
-                            <p className="text-sm text-gray-400 text-center py-2">尚無數據</p>
-                        )}
-                    </div>
-                </div>
+                {/* Helper for rendering ranking list with emphasis on 1st place */}
+                {renderCategoryBlock(metaphysics.topProfitable, "最賺號碼", DollarSign, "from-yellow-50 to-orange-50", "border-orange-100", "text-orange-800", "bg-orange-500", "bg-orange-100", "text-red-600")}
 
-                {/* 3. Most Profitable Lotteries */}
-                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-100">
-                    <h4 className="font-bold text-blue-800 mb-3 flex items-center gap-2">
-                        <Trophy className="w-5 h-5" />
-                        最賺款式 (回報率)
-                    </h4>
-                    <div className="space-y-2">
-                        {metaphysics.topLotteries.map((item, index) => (
-                            <div key={index} className="bg-white/60 rounded-lg p-2 border border-blue-100/50">
-                                <div className="flex justify-between items-center mb-1">
-                                    <div className="flex items-center gap-2">
-                                        <span className={`flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold ${index === 0 ? 'bg-blue-500 text-white' : 'bg-blue-200 text-blue-800'}`}>
-                                            {index + 1}
-                                        </span>
-                                        <span className="font-bold text-gray-800 text-sm truncate max-w-[120px]">{item.name}</span>
-                                    </div>
-                                    <span className={`font-bold text-sm ${item.roi >= 100 ? 'text-green-600' : 'text-gray-600'}`}>
-                                        {item.roi.toFixed(0)}%
-                                    </span>
-                                </div>
-                                <div className="flex justify-between text-xs text-gray-500 pl-7">
-                                    <span>{item.count}張 / ${item.win.toLocaleString()}</span>
-                                </div>
-                            </div>
-                        ))}
-                        {metaphysics.topLotteries.length === 0 && (
-                            <p className="text-sm text-gray-400 text-center py-2">尚無數據</p>
-                        )}
-                    </div>
-                </div>
+                {renderCategoryBlock(metaphysics.topCP, "CP值之王", TrendingUp, "from-purple-50 to-pink-50", "border-purple-100", "text-purple-800", "bg-purple-500", "bg-purple-100", "text-gray-800", true)}
 
-                {/* 4. Top Regions */}
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
-                    <h4 className="font-bold text-green-800 mb-3 flex items-center gap-2">
-                        <MapPin className="w-5 h-5" />
-                        最賺地區 (總獎金)
-                    </h4>
-                    <div className="space-y-2">
-                        {metaphysics.topRegions.map((item, index) => (
-                            <div key={index} className="flex justify-between items-center bg-white/60 rounded-lg p-2 border border-green-100/50">
-                                <div className="flex items-center gap-3">
-                                    <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${index === 0 ? 'bg-green-500 text-white' : 'bg-green-200 text-green-800'}`}>
-                                        {index + 1}
-                                    </span>
-                                    <span className="font-bold text-gray-800">{item.location}</span>
-                                </div>
-                                <div className="text-right">
-                                    <span className="block font-bold text-red-600 text-sm">
-                                        ${item.totalWin.toLocaleString()}
-                                    </span>
-                                    <span className="text-[10px] text-gray-400 block">
-                                        本: ${item.totalSpent.toLocaleString()}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                        {metaphysics.topRegions.length === 0 && (
-                            <p className="text-sm text-gray-400 text-center py-2">尚無數據</p>
-                        )}
-                    </div>
-                </div>
+                {renderCategoryBlock(metaphysics.topLotteries, "最賺款式", Trophy, "from-blue-50 to-cyan-50", "border-blue-100", "text-blue-800", "bg-blue-500", "bg-blue-100", "text-green-600", true, true)}
+
+                {renderCategoryBlock(metaphysics.topRegions, "最賺地區", MapPin, "from-green-50 to-emerald-50", "border-green-100", "text-green-800", "bg-green-500", "bg-green-100", "text-red-600", false, false, true)}
+
             </div>
 
             <p className="text-[10px] text-gray-400 mt-4 text-center">
@@ -149,3 +47,70 @@ export function MetaphysicsReveal({ stats }) {
         </GlassCard>
     );
 }
+
+// Helper function to render a category block
+function renderCategoryBlock(items, title, Icon, bgGradient, borderColor, titleColor, badgeColor1, badgeColorRest, valueColor, isPercent = false, isLottery = false, isRegion = false) {
+    if (!items || items.length === 0) return (
+        <div className={`rounded-xl p-3 border ${borderColor} bg-gradient-to-br ${bgGradient} col-span-1`}>
+            <h4 className={`font-bold ${titleColor} mb-2 flex items-center gap-1 text-sm`}>
+                <Icon className="w-4 h-4" /> {title}
+            </h4>
+            <p className="text-xs text-gray-400 text-center py-2">尚無數據</p>
+        </div>
+    );
+
+    const first = items[0];
+    const rest = items.slice(1);
+
+    return (
+        <div className={`rounded-xl p-3 border ${borderColor} bg-gradient-to-br ${bgGradient} col-span-1 flex flex-col h-full`}>
+            {/* Header */}
+            <h4 className={`font-bold ${titleColor} mb-3 flex items-center gap-1 text-sm whitespace-nowrap`}>
+                <Icon className="w-4 h-4" /> {title}
+            </h4>
+
+            {/* 1st Place (Prominent) */}
+            <div className="bg-white/80 rounded-lg p-3 border border-white/50 mb-2 shadow-sm flex-1 flex flex-col justify-center items-center text-center relative overflow-hidden">
+                <div className={`absolute top-0 left-0 px-2 py-0.5 text-[10px] font-bold text-white ${badgeColor1} rounded-br-lg flex items-center gap-1 z-10`}>
+                    TOP 1
+                </div>
+
+
+                {/* Main Content */}
+                <div className="mt-2 w-full">
+                    <span className="block text-2xl font-black text-gray-800 leading-tight truncate w-full">
+                        {isLottery ? first.name : (isRegion ? first.location : `#${first.ticketNo}`)}
+                    </span>
+                    <span className={`block text-lg font-bold ${valueColor} mt-1`}>
+                        {isPercent ? `${first.roi.toFixed(0)}%` : `$${first.totalWin ? first.totalWin.toLocaleString() : (first.win ? first.win.toLocaleString() : 0)}`}
+                    </span>
+                    {/* Sub-info for 1st place */}
+                    <span className="text-[10px] text-gray-400 block mt-1">
+                        {isLottery ? `${first.count}張` : (isRegion ? `本:$${first.totalSpent.toLocaleString()}` : (isPercent ? `樣本:${first.count}` : ''))}
+                    </span>
+                </div>
+            </div>
+
+            {/* 2nd & 3rd Place (Compact) */}
+            <div className="space-y-1.5">
+                {rest.map((item, index) => (
+                    <div key={index} className="flex justify-between items-center bg-white/40 rounded px-2 py-1 text-xs border border-white/30">
+                        <div className="flex items-center gap-1.5 overflow-hidden flex-1">
+                            <span className={`flex-shrink-0 flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold ${badgeColorRest} ${titleColor.replace('text-', 'text-opacity-80 ')}`}>
+                                {index + 2}
+                            </span>
+                            <span className="font-bold text-gray-700 truncate max-w-[60px]">
+                                {isLottery ? item.name : (isRegion ? item.location : `#${item.ticketNo}`)}
+                            </span>
+
+                        </div>
+                        <span className={`font-bold ${valueColor} flex-shrink-0`}>
+                            {isPercent ? `${item.roi.toFixed(0)}%` : `$${item.totalWin ? item.totalWin.toLocaleString() : (item.win ? item.win.toLocaleString() : 0)}`}
+                        </span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+

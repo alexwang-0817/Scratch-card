@@ -14,12 +14,15 @@ export function SubmissionForm({ onSubmit, loading }) {
         items: [{ id: Date.now() + 1, ticketNo: '', winAmount: '' }]
     }]);
     const [nickname, setNickname] = useState('');
+    const [location, setLocation] = useState(''); // Add location state
     const [submitted, setSubmitted] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
-        const saved = localStorage.getItem('scratch_nickname');
-        if (saved) setNickname(saved);
+        const savedNickname = localStorage.getItem('scratch_nickname');
+        const savedLocation = localStorage.getItem('scratch_location'); // Restore location
+        if (savedNickname) setNickname(savedNickname);
+        if (savedLocation) setLocation(savedLocation);
     }, []);
 
     // --- Entry (Lottery Type) Management ---
@@ -106,7 +109,7 @@ export function SubmissionForm({ onSubmit, loading }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!nickname) return;
+        if (!nickname || !location) return; // Validate location
 
         // Flatten entries
         const submissions = [];
@@ -116,9 +119,11 @@ export function SubmissionForm({ onSubmit, loading }) {
                 const winAmount = parseInt(item.winAmount) || 0;
                 submissions.push({
                     nickname,
+                    location, // Add location to submission
                     lottery_id: entry.lotteryId,
                     count: 1,
                     win_amount: winAmount,
+                    ticket_no: item.ticketNo ? item.ticketNo.padStart(3, '0') : null,
                 });
             });
         });
@@ -145,6 +150,18 @@ export function SubmissionForm({ onSubmit, loading }) {
             console.error("Submission failed", error);
         }
     };
+
+    // Lock body scroll when modal is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
 
     return (
         <div className="w-full relative">
@@ -178,11 +195,11 @@ export function SubmissionForm({ onSubmit, loading }) {
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             className="fixed inset-0 flex items-center justify-center z-[70] p-4 pointer-events-none"
                         >
-                            <div className="w-full max-w-lg pointer-events-auto flex flex-col max-h-[90vh]">
-                                <div className="bg-gray-100 rounded-2xl shadow-2xl flex flex-col overflow-hidden h-full">
+                            <div className="w-full max-w-lg pointer-events-auto flex flex-col max-h-[90vh] h-full">
+                                <div className="bg-gray-100 rounded-2xl shadow-2xl flex flex-col overflow-hidden h-full w-full">
 
                                     {/* Modal Header */}
-                                    <div className="p-4 bg-white border-b border-gray-200 flex justify-between items-center flex-shrink-0">
+                                    <div className="p-4 bg-white border-b border-gray-200 flex justify-between items-center flex-shrink-0 z-20 relative">
                                         <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                                             <Trophy className="w-5 h-5 text-yellow-500" />
                                             回報戰績
@@ -195,54 +212,98 @@ export function SubmissionForm({ onSubmit, loading }) {
                                         </button>
                                     </div>
 
-                                    {/* Modal Body (Scrollable) */}
-                                    <div className="overflow-y-auto p-4 custom-scrollbar">
-                                        <AnimatePresence mode="wait">
-                                            {submitted ? (
-                                                <GlassCard whileHover={{}} className="w-full relative bg-white border border-gray-200 shadow-sm overflow-hidden">
-                                                    <motion.div
-                                                        initial={{ opacity: 0, scale: 0.8 }}
-                                                        animate={{ opacity: 1, scale: 1 }}
-                                                        exit={{ opacity: 0, scale: 0.8 }}
-                                                        className="flex flex-col items-center justify-center py-12 text-center"
-                                                    >
-                                                        <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-4 shadow-lg text-white">
-                                                            <Check className="w-8 h-8" />
-                                                        </div>
-                                                        <h3 className="text-xl font-bold text-gray-800 mb-2">感謝回報！</h3>
-                                                        <p className="text-gray-500">祝您蛇年行大運，發大財！</p>
-                                                    </motion.div>
-                                                </GlassCard>
-                                            ) : (
-                                                <motion.div
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 1 }}
-                                                    exit={{ opacity: 0 }}
-                                                    className="flex flex-col space-y-3"
-                                                >
-                                                    {/* Nickname Block */}
-                                                    <GlassCard whileHover={{}} className="w-full relative bg-white border border-gray-200 shadow-sm overflow-hidden p-4">
-                                                        <label className="block text-sm font-bold text-gray-700 mb-1">發財外號</label>
-                                                        <p className="text-xs text-gray-400 mb-3">這個暱稱只會用來當作回報者的區隔，沒有其他實質用途喔～</p>
-                                                        <input
-                                                            type="text"
-                                                            required
-                                                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all placeholder-gray-400"
-                                                            placeholder="例如：刮刮樂股神"
-                                                            value={nickname}
-                                                            onChange={(e) => setNickname(e.target.value)}
-                                                        />
-                                                    </GlassCard>
+                                    {/* Form Container (Wraps Body & Footer) */}
+                                    <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden relative">
 
-                                                    {/* Form Block */}
+                                        {/* Modal Body (Scrollable) */}
+                                        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar pb-24">
+                                            <AnimatePresence mode="wait">
+                                                {submitted ? (
                                                     <GlassCard whileHover={{}} className="w-full relative bg-white border border-gray-200 shadow-sm overflow-hidden">
-                                                        <h2 className="text-xl font-bold mb-4 text-center text-gray-800 flex items-center justify-center gap-2">
-                                                            <Sparkles className="w-5 h-5 text-yellow-500 animate-pulse" />
-                                                            戰績細節
-                                                            <Sparkles className="w-5 h-5 text-yellow-500 animate-pulse" />
-                                                        </h2>
+                                                        <motion.div
+                                                            initial={{ opacity: 0, scale: 0.8 }}
+                                                            animate={{ opacity: 1, scale: 1 }}
+                                                            exit={{ opacity: 0, scale: 0.8 }}
+                                                            className="flex flex-col items-center justify-center py-12 text-center"
+                                                        >
+                                                            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-4 shadow-lg text-white">
+                                                                <Check className="w-8 h-8" />
+                                                            </div>
+                                                            <h3 className="text-xl font-bold text-gray-800 mb-2">感謝回報！</h3>
+                                                            <p className="text-gray-500">祝您蛇年行大運，發大財！</p>
+                                                        </motion.div>
+                                                    </GlassCard>
+                                                ) : (
+                                                    <motion.div
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        exit={{ opacity: 0 }}
+                                                        className="flex flex-col space-y-3"
+                                                    >
+                                                        {/* Nickname & Location Block */}
+                                                        <GlassCard whileHover={{}} className="w-full relative bg-white border border-gray-200 shadow-sm overflow-hidden p-4">
+                                                            <div className="flex gap-4">
+                                                                <div className="flex-1">
+                                                                    <label className="block text-sm font-bold text-gray-700 mb-1">發財外號</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        required
+                                                                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all placeholder-gray-400 text-sm"
+                                                                        placeholder="例如：刮刮樂股神"
+                                                                        value={nickname}
+                                                                        onChange={(e) => setNickname(e.target.value)}
+                                                                    />
+                                                                </div>
+                                                                <div className="w-1/3">
+                                                                    <label className="block text-sm font-bold text-gray-700 mb-1">所在地區</label>
+                                                                    <div className="relative">
+                                                                        <select
+                                                                            required
+                                                                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all text-sm appearance-none"
+                                                                            value={location}
+                                                                            onChange={(e) => setLocation(e.target.value)}
+                                                                        >
+                                                                            <option value="" disabled>請選擇...</option>
+                                                                            <option value="基隆市">基隆市</option>
+                                                                            <option value="台北市">台北市</option>
+                                                                            <option value="新北市">新北市</option>
+                                                                            <option value="桃園市">桃園市</option>
+                                                                            <option value="新竹市">新竹市</option>
+                                                                            <option value="新竹縣">新竹縣</option>
+                                                                            <option value="苗栗縣">苗栗縣</option>
+                                                                            <option value="台中市">台中市</option>
+                                                                            <option value="彰化縣">彰化縣</option>
+                                                                            <option value="南投縣">南投縣</option>
+                                                                            <option value="雲林縣">雲林縣</option>
+                                                                            <option value="嘉義市">嘉義市</option>
+                                                                            <option value="嘉義縣">嘉義縣</option>
+                                                                            <option value="台南市">台南市</option>
+                                                                            <option value="高雄市">高雄市</option>
+                                                                            <option value="屏東縣">屏東縣</option>
+                                                                            <option value="宜蘭縣">宜蘭縣</option>
+                                                                            <option value="花蓮縣">花蓮縣</option>
+                                                                            <option value="台東縣">台東縣</option>
+                                                                            <option value="澎湖縣">澎湖縣</option>
+                                                                            <option value="金門縣">金門縣</option>
+                                                                            <option value="連江縣">連江縣</option>
+                                                                        </select>
+                                                                        <div className="absolute right-2 top-2.5 pointer-events-none text-gray-400">
+                                                                            <ChevronDown className="w-4 h-4" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <p className="text-xs text-gray-400 mt-2">這個暱稱與地區只會用來當作回報者的區隔，沒有其他實質用途喔～</p>
+                                                        </GlassCard>
 
-                                                        <form onSubmit={handleSubmit} className="flex flex-col">
+                                                        {/* Form Block */}
+                                                        <GlassCard whileHover={{}} className="w-full relative bg-white border border-gray-200 shadow-sm overflow-hidden">
+                                                            <h2 className="text-xl font-bold mb-4 text-center text-gray-800 flex items-center justify-center gap-2">
+                                                                <Sparkles className="w-5 h-5 text-yellow-500 animate-pulse" />
+                                                                戰績細節
+                                                                <Sparkles className="w-5 h-5 text-yellow-500 animate-pulse" />
+                                                            </h2>
+
                                                             {/* Entries List */}
                                                             <div className="space-y-4 mb-4">
                                                                 {entries.map((entry, index) => (
@@ -331,26 +392,25 @@ export function SubmissionForm({ onSubmit, loading }) {
                                                                                                     </div>
                                                                                                 </div>
 
-                                                                                                {/* Ticket Number */}
                                                                                                 <div className="flex-1">
-                                                                                                    <label className="block text-xs text-gray-500 mb-1">編號</label>
+                                                                                                    <label className="block text-xs text-gray-500 mb-1">
+                                                                                                        編號 <span className="text-[10px] text-gray-400 font-normal">(3碼數字)</span>
+                                                                                                    </label>
                                                                                                     <div className="relative">
                                                                                                         <input
                                                                                                             type="text"
                                                                                                             inputMode="numeric"
-                                                                                                            list={`ticket-options-${item.id}`}
+                                                                                                            maxLength={3}
                                                                                                             required
-                                                                                                            placeholder="#"
+                                                                                                            placeholder="001"
                                                                                                             disabled={!entry.lotteryId}
                                                                                                             className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-center font-mono text-sm disabled:bg-gray-50 disabled:text-gray-400 appearance-none"
                                                                                                             value={item.ticketNo || ''}
-                                                                                                            onChange={(e) => updateItem(entry.id, item.id, 'ticketNo', e.target.value)}
+                                                                                                            onChange={(e) => {
+                                                                                                                const val = e.target.value.replace(/\D/g, ''); // Only allow numbers
+                                                                                                                updateItem(entry.id, item.id, 'ticketNo', val);
+                                                                                                            }}
                                                                                                         />
-                                                                                                        <datalist id={`ticket-options-${item.id}`}>
-                                                                                                            {entry.lotteryId && Array.from({ length: mockLotteries.find(l => l.id === entry.lotteryId)?.total_in_book || 100 }, (_, i) => i + 1).map(num => (
-                                                                                                                <option key={num} value={String(num).padStart(3, '0')} />
-                                                                                                            ))}
-                                                                                                        </datalist>
                                                                                                     </div>
                                                                                                 </div>
 
@@ -393,48 +453,47 @@ export function SubmissionForm({ onSubmit, loading }) {
                                                             >
                                                                 新增種類 +
                                                             </button>
+                                                        </GlassCard>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
 
-                                                            {/* Summary & Submit */}
-                                                            <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm mb-4">
-                                                                <h5 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 text-center border-b border-gray-100 pb-2">本次回報試算</h5>
-                                                                <div className="flex items-center text-center">
-                                                                    <div className="w-[40%] flex flex-col justify-center border-r border-gray-200 pr-2">
-                                                                        <div className="text-xs text-gray-500 mb-0.5">總中獎</div>
-                                                                        <div className="text-xl md:text-2xl font-black text-red-600 tracking-tight">${summary.totalWin.toLocaleString()}</div>
-                                                                    </div>
-                                                                    <div className="w-[60%] grid grid-cols-3 gap-1 pl-2 items-center">
-                                                                        <div>
-                                                                            <div className="text-[10px] text-gray-400 mb-0.5">回本率</div>
-                                                                            <div className={`text-sm font-bold ${roi >= 100 ? 'text-green-600' : roi >= 60 ? 'text-yellow-600' : 'text-gray-500'}`}>
-                                                                                {roi.toFixed(0)}%
-                                                                            </div>
-                                                                        </div>
-                                                                        <div>
-                                                                            <div className="text-[10px] text-gray-400 mb-0.5">總花費</div>
-                                                                            <div className="text-sm font-bold text-gray-700">${summary.totalSpent.toLocaleString()}</div>
-                                                                        </div>
-                                                                        <div>
-                                                                            <div className="text-[10px] text-gray-400 mb-0.5">總張數</div>
-                                                                            <div className="text-sm font-bold text-gray-700">{summary.totalTickets} 張</div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                        {/* Modal Footer (Sticky Bottom) - Only show when not submitted */}
+                                        {!submitted && (
+                                            <div className="p-4 bg-white border-t border-gray-200 flex-shrink-0 z-20 shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
+                                                {/* Summary & Submit - Moved from inside scrollable area to here */}
+                                                <div className="bg-gray-50 rounded-lg p-3 border border-gray-100 mb-3">
+                                                    <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 text-center border-b border-gray-200 pb-1">本次回報試算</h5>
+                                                    <div className="flex items-center text-center justify-between">
+                                                        <div className="flex flex-col items-center flex-1 border-r border-gray-200">
+                                                            <span className="text-[10px] text-gray-400">總花費</span>
+                                                            <span className="text-sm font-bold text-gray-700">${summary.totalSpent.toLocaleString()}</span>
+                                                        </div>
+                                                        <div className="flex flex-col items-center flex-[1.5] border-r border-gray-200 px-2">
+                                                            <span className="text-[10px] text-gray-400">總中獎</span>
+                                                            <span className="text-xl font-black text-red-600">${summary.totalWin.toLocaleString()}</span>
+                                                        </div>
+                                                        <div className="flex flex-col items-center flex-1">
+                                                            <span className="text-[10px] text-gray-400">回本率</span>
+                                                            <span className={`text-sm font-bold ${roi >= 100 ? 'text-green-600' : roi >= 60 ? 'text-yellow-600' : 'text-gray-500'}`}>
+                                                                {roi.toFixed(0)}%
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                                                            <button
-                                                                type="submit"
-                                                                disabled={loading}
-                                                                className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 text-white font-bold py-3 rounded-lg shadow-md transform hover:translate-y-[-1px] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                                            >
-                                                                {loading ? <Loader2 className="animate-spin" /> : <Coins className="w-5 h-5" />}
-                                                                送出戰績
-                                                            </button>
-                                                        </form>
-                                                    </GlassCard>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
+                                                <button
+                                                    type="submit"
+                                                    disabled={loading}
+                                                    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 text-white font-bold py-3.5 rounded-xl shadow-lg border-b-4 border-yellow-700 active:border-b-0 active:translate-y-1 transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    {loading ? <Loader2 className="animate-spin" /> : <Coins className="w-5 h-5" />}
+                                                    送出戰績
+                                                </button>
+                                            </div>
+                                        )}
+                                    </form>
                                 </div>
                             </div>
                         </motion.div>

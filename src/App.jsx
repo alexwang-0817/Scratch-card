@@ -1,5 +1,6 @@
 import React from 'react';
 import { SubmissionForm } from './components/SubmissionForm';
+import { MetaphysicsReveal } from './components/MetaphysicsReveal';
 import { Dashboard } from './components/Dashboard';
 import { useScratchStats } from './hooks/useScratchStats';
 import { motion } from 'framer-motion';
@@ -9,10 +10,7 @@ import { StatsOverview } from './components/StatsOverview';
 function App() {
   const { stats, submitData, loading, error } = useScratchStats();
 
-  // DEBUG: Check if API Key is loaded correctly
-  const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
-  console.log('Current API Key (Prefix):', apiKey ? apiKey.substring(0, 5) + '...' : 'UNDEFINED');
-  console.log('Full Env:', import.meta.env);
+
 
   return (
     <div className="min-h-screen relative overflow-hidden text-gray-900 font-sans bg-gray-50 pb-20">
@@ -59,6 +57,9 @@ function App() {
           {/* Left Column: Submission Form (Sticky) */}
           <section className="md:col-span-4 sticky top-8 z-20">
             <SubmissionForm onSubmit={submitData} loading={loading} />
+
+            {/* Metaphysics Reveal Block */}
+            <MetaphysicsReveal stats={stats} />
 
             <div className="mt-6 p-5 rounded-xl bg-white border border-gray-200 text-center shadow-sm">
               <h3 className="text-gray-800 font-bold mb-2 flex items-center justify-center gap-2">

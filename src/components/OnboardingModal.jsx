@@ -178,8 +178,7 @@ export function OnboardingModal() {
                                 {slides.map((_, index) => (
                                     <div
                                         key={index}
-                                        className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-gray-800 w-6' : 'bg-gray-300'
-                                            }`}
+                                        className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-gray-800 w-6' : 'bg-gray-300'}`}
                                     />
                                 ))}
                             </div>
@@ -196,14 +195,14 @@ export function OnboardingModal() {
                                 )}
                                 <button
                                     onClick={handleNext}
-                                    className={`flex-[2] py-3.5 px-6 rounded-xl font-bold text-white shadow-lg transform transition-all active:scale-95 flex items-center justify-center gap-2
-                  ${currentSlide === slides.length - 1
+                                    className={`flex-[2] py-3.5 px-6 rounded-xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2 text-white shadow-lg
+                                      ${currentSlide === slides.length - 1
                                             ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 shadow-orange-200'
                                             : 'bg-gray-900 hover:bg-black shadow-gray-200'
                                         }`}
                                 >
                                     {currentSlide === slides.length - 1 ? (
-                                        <>開始探索 <Sparkles className="w-4 h-4" /></>
+                                        "開刮！"
                                     ) : (
                                         <>下一步 <ChevronRight className="w-4 h-4" /></>
                                     )}

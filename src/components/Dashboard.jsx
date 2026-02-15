@@ -5,6 +5,7 @@ import mockLotteries from '../data/lotteries';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PrizeStructureModal } from './PrizeStructureModal';
 import { ChevronRight } from 'lucide-react';
+import { LotteryAvatar } from './LotteryAvatar';
 
 export function Dashboard({ stats, loading }) {
     const [selectedLottery, setSelectedLottery] = useState(null);
@@ -36,10 +37,12 @@ export function Dashboard({ stats, loading }) {
                                 onClick={() => setSelectedLottery(l)}
                                 className="p-4 flex flex-row items-center gap-4 hover:shadow-lg hover:border-yellow-200 transition-all bg-white border border-gray-100 rounded-xl cursor-pointer group"
                             >
-                                {/* Image */}
-                                <div className="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 shadow-inner group-hover:scale-105 transition-transform duration-300">
-                                    <img src={l.img_url} alt={l.name} className="w-full h-full object-cover" />
-                                </div>
+                                {/* Avatar */}
+                                <LotteryAvatar
+                                    name={l.name}
+                                    price={l.price}
+                                    className="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg shadow-inner group-hover:scale-105 transition-transform duration-300 text-2xl md:text-3xl"
+                                />
 
                                 {/* Info */}
                                 <div className="flex-grow text-left">
@@ -61,8 +64,8 @@ export function Dashboard({ stats, loading }) {
                                         </div>
                                     ) : (
                                         <div className={`text-xl md:text-2xl font-black ${lWinRate > 50 ? 'text-green-600' :
-                                                lWinRate >= 30 ? 'text-yellow-500' :
-                                                    'text-gray-400'
+                                            lWinRate >= 30 ? 'text-yellow-500' :
+                                                'text-gray-400'
                                             }`}>
                                             {lWinRate.toFixed(1)}%
                                         </div>

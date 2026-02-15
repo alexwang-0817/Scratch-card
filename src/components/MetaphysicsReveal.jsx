@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import { GlassCard } from './GlassCard';
 import { Sparkles, TrendingUp, DollarSign, Trophy, MapPin, TrendingDown, Minus, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';

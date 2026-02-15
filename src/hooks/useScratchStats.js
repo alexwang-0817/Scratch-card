@@ -19,7 +19,9 @@ export function useScratchStats() {
         lotteryStats: {},
         metaphysics: { // Add default structure
             topProfitable: [],
-            topCP: []
+            topCP: [],
+            topLotteries: [],
+            topRegions: []
         }
     });
     // const [recentContributions, setRecentContributions] = useState([]); // Unused
@@ -50,30 +52,44 @@ export function useScratchStats() {
             let tw = 0;
             const ls = {};
             const ticketMap = {}; // Map for ticket statistics
+            const regionMap = {}; // Map for region statistics
 
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 const count = parseInt(data.count) || 0;
                 const dist = parseInt(data.win_amount) || 0;
                 const ticketNo = data.ticket_no;
+                const location = data.location;
+                const lotteryId = data.lottery_id;
 
                 tc += count;
                 tw += dist;
 
-                // Existing lottery stats logic
-                if (!ls[data.lottery_id]) {
-                    ls[data.lottery_id] = { count: 0, win: 0, reports: 0 };
+                // Existing lottery stats logic (Enhanced for "Most Profitable Lottery Type")
+                if (!ls[lotteryId]) {
+                    const lottery = mockLotteries.find(l => l.id === lotteryId);
+                    const price = lottery ? lottery.price : 0;
+                    ls[lotteryId] = {
+                        id: lotteryId,
+                        name: lottery ? lottery.name : lotteryId,
+                        count: 0,
+                        win: 0,
+                        spent: 0,
+                        reports: 0
+                    };
                 }
-                ls[data.lottery_id].count += count;
-                ls[data.lottery_id].win += dist;
-                ls[data.lottery_id].reports += 1;
+                // Get price each time in case it changes, but usually static. Better to get from ls if set.
+                // For simple accumulation:
+                const lottery = mockLotteries.find(l => l.id === lotteryId);
+                const price = lottery ? lottery.price : 0;
+
+                ls[lotteryId].count += count;
+                ls[lotteryId].win += dist;
+                ls[lotteryId].spent += (price * count);
+                ls[lotteryId].reports += 1;
 
                 // New Metaphysics Logic (Ticket Statistics)
                 if (ticketNo) {
-                    // Find price
-                    const lottery = mockLotteries.find(l => l.id === data.lottery_id);
-                    const price = lottery ? lottery.price : 0;
-
                     if (!ticketMap[ticketNo]) {
                         ticketMap[ticketNo] = { ticketNo, totalWin: 0, totalSpent: 0, count: 0 };
                     }
@@ -81,21 +97,45 @@ export function useScratchStats() {
                     ticketMap[ticketNo].totalSpent += (price * count);
                     ticketMap[ticketNo].count += count;
                 }
+
+                // Region Statistics
+                if (location) {
+                    if (!regionMap[location]) {
+                        regionMap[location] = { location, totalWin: 0, totalSpent: 0 };
+                    }
+                    regionMap[location].totalWin += dist;
+                    regionMap[location].totalSpent += (price * count);
+                }
             });
 
             // Calculate Metaphysics Results
             const ticketArray = Object.values(ticketMap);
 
-            // 1. Top Profitable (Total Win Amount)
+            // 1. Top Profitable Numbers (Total Win Amount)
             const topProfitable = [...ticketArray]
                 .sort((a, b) => b.totalWin - a.totalWin)
                 .slice(0, 3);
 
-            // 2. Best CP (ROI) - Filter out cases with 0 spread to avoid NaN/Infinity issues if spent is 0 (unlikely but safe)
+            // 2. Best CP Numbers (ROI)
             const topCP = [...ticketArray]
                 .filter(t => t.totalSpent > 0)
                 .map(t => ({ ...t, roi: (t.totalWin / t.totalSpent) * 100 }))
                 .sort((a, b) => b.roi - a.roi)
+                .slice(0, 3);
+
+            // 3. Top Profitable Lotteries
+            const topLotteries = Object.values(ls)
+                .filter(l => l.spent > 0)
+                .map(l => ({
+                    ...l,
+                    roi: (l.win / l.spent) * 100
+                }))
+                .sort((a, b) => b.roi - a.roi) // Sort by ROI? User asked for "Most Profitable Type: count, win, roi". Usually sort by ROI or Win? Let's sort by ROI for "Most Profitable" in context of gambling, or total Win? "最賺" usually means Net Profit or ROI. Let's use ROI as primary sort, but show all stats.
+                .slice(0, 3);
+
+            // 4. Top Regions (Total Win Amount)
+            const topRegions = Object.values(regionMap)
+                .sort((a, b) => b.totalWin - a.totalWin)
                 .slice(0, 3);
 
             setStats({
@@ -104,7 +144,9 @@ export function useScratchStats() {
                 lotteryStats: ls,
                 metaphysics: {
                     topProfitable,
-                    topCP
+                    topCP,
+                    topLotteries,
+                    topRegions
                 }
             });
             setLoading(false);

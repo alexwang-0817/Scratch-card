@@ -30,10 +30,8 @@ export function MetaphysicsModal({ isOpen, onClose, details }) {
     };
 
     const getValueColor = (item) => {
-        if (type === 'cp' || type === 'lottery') {
-            return item.roi >= 100 ? 'text-red-500' : 'text-green-600'; // High ROI = Red (Good in TW)
-        }
-        return 'text-red-500'; // High Money = Red
+        if (item.rank !== 1) return 'text-gray-900';
+        return 'text-green-600';
     };
 
     return (

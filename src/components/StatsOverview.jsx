@@ -29,13 +29,11 @@ export function StatsOverview({ stats, loading }) {
                 {/* Primary Stat: Total Win Amount */}
                 <div className="mb-6 relative z-10">
                     <h2 className="text-gray-500 text-sm md:text-base font-bold uppercase tracking-wider mb-2">全台中獎總金額</h2>
-                    <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
+                    <div
                         className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-600 font-mono"
                     >
                         <StatItem value={totalWin} prefix="" suffix=" $" />
-                    </motion.div>
+                    </div>
                 </div>
 
                 {/* Secondary Stats Grid */}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { GlassCard } from './GlassCard';
-import { Sparkles, TrendingUp, DollarSign, Trophy, MapPin, TrendingDown, Minus, Zap } from 'lucide-react';
+import { Sparkles, TrendingUp, DollarSign, Trophy, MapPin, TrendingDown, Minus, Zap, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { MetaphysicsModal } from './MetaphysicsModal';
 
@@ -39,7 +39,7 @@ export function MetaphysicsReveal({ stats }) {
                 <div className="absolute inset-[-200%] animate-[spin-slow_8s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_300deg,#f9a8d4_320deg,#d8b4fe_340deg,#93c5fd_360deg)] opacity-70"></div>
                 <GlassCard whileHover={{}} className="p-6 bg-white/95 backdrop-blur-md relative overflow-hidden w-full h-full rounded-[10px]">
                     <h3 className="text-xl font-black text-purple-900 mb-6 flex items-center gap-2 relative z-10">
-                        玄學開獎
+                        財富密碼
                     </h3>
 
                     {/* Grid Layout: Mobile 2 cols, Desktop 1 col */}
@@ -122,16 +122,17 @@ function renderCategoryBlock(
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onClick}
-            className={`rounded-xl p-3 border ${borderColor} bg-gradient-to-br ${bgGradient} col-span-1 flex flex-col h-full cursor-pointer hover:shadow-lg transition-shadow relative group`}
+            className={`rounded-xl p-3 border ${borderColor} bg-gradient-to-br ${bgGradient} col-span-1 flex flex-col h-full cursor-pointer hover:shadow-lg transition-shadow relative group/block`}
         >
             {/* Header */}
-            <h4 className={`font-bold ${titleColor} mb-3 flex items-center gap-1 text-sm whitespace-nowrap`}>
-                <Icon className="w-4 h-4" /> {title}
+            <h4 className={`font-bold ${titleColor} mb-3 flex items-center justify-between text-sm whitespace-nowrap`}>
+                <span className="flex items-center gap-1"><Icon className="w-4 h-4" /> {title}</span>
+                <ChevronRight className="w-4 h-4 opacity-60 group-hover/block:opacity-100 group-hover/block:translate-x-1 transition-all" />
             </h4>
 
 
             {/* 1st Place (Prominent) */}
-            <div className="bg-white/80 rounded-lg p-3 border border-white/50 mb-2 shadow-sm flex-1 flex flex-col justify-center items-center text-center relative overflow-hidden group-hover:bg-white/95 transition-colors">
+            <div className="bg-white/80 rounded-lg p-3 border border-white/50 mb-2 shadow-sm flex-1 flex flex-col justify-center items-center text-center relative overflow-hidden group-hover/block:bg-white/95 transition-colors">
                 <div className={`absolute top-0 left-0 px-2 py-0.5 text-[10px] font-bold text-white ${badgeColor1} rounded-br-lg flex items-center gap-1 z-10`}>
                     TOP 1
                 </div>
@@ -168,7 +169,7 @@ function renderCategoryBlock(
             {/* 2nd & 3rd Place (Compact) */}
             <div className="space-y-1.5">
                 {rest.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center bg-white/40 rounded px-2 py-1 text-xs border border-white/30 group-hover:bg-white/60 transition-colors">
+                    <div key={index} className="flex justify-between items-center bg-white/40 rounded px-2 py-1 text-xs border border-white/30 group-hover/block:bg-white/60 transition-colors">
                         <div className="flex items-center gap-1.5 overflow-hidden flex-1">
                             <span className={`flex-shrink-0 flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold ${badgeColorRest} ${titleColor.replace('text-', 'text-opacity-80 ')}`}>
                                 {index + 2}

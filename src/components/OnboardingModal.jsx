@@ -116,12 +116,7 @@ export function OnboardingModal() {
                             </motion.div>
 
                             {/* Skip Button */}
-                            <button
-                                onClick={handleClose}
-                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-medium text-sm px-3 py-1 bg-white/50 rounded-full backdrop-blur-md"
-                            >
-                                跳過
-                            </button>
+
                         </div>
 
                         {/* Content Area */}

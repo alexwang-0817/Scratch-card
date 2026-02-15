@@ -159,7 +159,7 @@ function renderCategoryBlock(
                     </span>
                     {/* Sub-info for 1st place: Always count */}
                     <span className="text-[10px] text-gray-400 block mt-1">
-                        {first.count}張
+                        總共 {first.count} 張
                     </span>
                 </div>
             </div>

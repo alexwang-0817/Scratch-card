@@ -9,6 +9,11 @@ import { StatsOverview } from './components/StatsOverview';
 function App() {
   const { stats, submitData, loading, error } = useScratchStats();
 
+  // DEBUG: Check if API Key is loaded correctly
+  const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
+  console.log('Current API Key (Prefix):', apiKey ? apiKey.substring(0, 5) + '...' : 'UNDEFINED');
+  console.log('Full Env:', import.meta.env);
+
   return (
     <div className="min-h-screen relative overflow-hidden text-gray-900 font-sans bg-gray-50 pb-20">
 

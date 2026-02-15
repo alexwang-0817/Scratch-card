@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 
 import { GlassCard } from './GlassCard';
 import { Sparkles, TrendingUp, DollarSign, Trophy, MapPin, TrendingDown, Minus, Zap, ChevronRight } from 'lucide-react';
-import { motion, useMotionValue, useSpring, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { MetaphysicsModal } from './MetaphysicsModal';
 
 const DESCRIPTIONS = {
@@ -11,32 +11,6 @@ const DESCRIPTIONS = {
     lottery: "計算該款刮刮樂的整體回本率 = (該款總回報獎金 / 該款總回報成本) * 100%。",
     region: "計算該地區累積的中獎金額總和。"
 };
-
-function CountUp({ value, formatter, delay = 1.2 }) {
-    const ref = useRef(null);
-    const motionValue = useMotionValue(0);
-    const springValue = useSpring(motionValue, { stiffness: 30, damping: 15 });
-    const isInView = useInView(ref, { once: true, margin: "0px" });
-
-    useEffect(() => {
-        if (isInView) {
-            const timer = setTimeout(() => {
-                motionValue.set(value);
-            }, delay * 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [motionValue, value, delay, isInView]);
-
-    useEffect(() => {
-        return springValue.on("change", (latest) => {
-            if (ref.current) {
-                ref.current.textContent = formatter(latest);
-            }
-        });
-    }, [springValue, formatter]);
-
-    return <span ref={ref}>{formatter(0)}</span>;
-}
 
 export function MetaphysicsReveal({ stats }) {
     const { metaphysics } = stats;
@@ -143,13 +117,6 @@ function renderCategoryBlock(
     const first = items[0];
     const rest = items.slice(1);
 
-    const formatValue = (val) => isPercent
-        ? `${val.toFixed(0)}%`
-        : `$${Math.floor(val).toLocaleString()}`;
-
-    // Values for CountUp
-    const firstValue = isPercent ? first.roi : (first.totalWin || first.win || 0);
-
     return (
         <motion.div
             whileHover={{ scale: 1.02 }}
@@ -190,7 +157,7 @@ function renderCategoryBlock(
                         {isLottery ? first.name : (isRegion ? first.location : `#${first.ticketNo}`)}
                     </span>
                     <span className="block text-lg font-bold text-gray-900 mt-1">
-                        <CountUp value={firstValue} formatter={formatValue} delay={1.8} />
+                        {isPercent ? `${first.roi.toFixed(0)}%` : `$${first.totalWin ? first.totalWin.toLocaleString() : (first.win ? first.win.toLocaleString() : 0)}`}
                     </span>
                     {/* Sub-info for 1st place: Always count */}
                     <span className="text-[10px] text-gray-400 block mt-1">
@@ -201,24 +168,21 @@ function renderCategoryBlock(
 
             {/* 2nd & 3rd Place (Compact) */}
             <div className="space-y-1.5">
-                {rest.map((item, index) => {
-                    const itemValue = isPercent ? item.roi : (item.totalWin || item.win || 0);
-                    return (
-                        <div key={index} className="flex justify-between items-center bg-white/40 rounded px-2 py-1 text-xs border border-white/30 group-hover/block:bg-white/60 transition-colors">
-                            <div className="flex items-center gap-1.5 overflow-hidden flex-1">
-                                <span className={`flex-shrink-0 flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold ${badgeColorRest} ${titleColor.replace('text-', 'text-opacity-80 ')}`}>
-                                    {index + 2}
-                                </span>
-                                <span className="font-bold text-gray-700 truncate max-w-[60px]">
-                                    {isLottery ? item.name : (isRegion ? item.location : `#${item.ticketNo}`)}
-                                </span>
-                            </div>
-                            <span className="font-bold text-gray-500 flex-shrink-0">
-                                <CountUp value={itemValue} formatter={formatValue} delay={1.8 + (index + 1) * 0.2} />
+                {rest.map((item, index) => (
+                    <div key={index} className="flex justify-between items-center bg-white/40 rounded px-2 py-1 text-xs border border-white/30 group-hover/block:bg-white/60 transition-colors">
+                        <div className="flex items-center gap-1.5 overflow-hidden flex-1">
+                            <span className={`flex-shrink-0 flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold ${badgeColorRest} ${titleColor.replace('text-', 'text-opacity-80 ')}`}>
+                                {index + 2}
+                            </span>
+                            <span className="font-bold text-gray-700 truncate max-w-[60px]">
+                                {isLottery ? item.name : (isRegion ? item.location : `#${item.ticketNo}`)}
                             </span>
                         </div>
-                    );
-                })}
+                        <span className="font-bold text-gray-500 flex-shrink-0">
+                            {isPercent ? `${item.roi.toFixed(0)}%` : `$${item.totalWin ? item.totalWin.toLocaleString() : (item.win ? item.win.toLocaleString() : 0)}`}
+                        </span>
+                    </div>
+                ))}
             </div>
         </motion.div>
     );

@@ -32,9 +32,10 @@ export function StatsOverview({ stats, loading }) {
                     <motion.div
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 1.5, duration: 0.5 }}
                         className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-600 font-mono"
                     >
-                        <StatItem value={totalWin} prefix="" suffix=" $" />
+                        <StatItem value={totalWin} prefix="" suffix=" $" delay={1.8} />
                     </motion.div>
                 </div>
 
@@ -45,7 +46,7 @@ export function StatsOverview({ stats, loading }) {
                     <div className="flex flex-col items-center">
                         <div className="text-gray-400 text-[10px] md:text-xs uppercase tracking-wider mb-1 font-semibold whitespace-nowrap">全台購買張數</div>
                         <div className="text-lg md:text-3xl font-bold text-gray-800">
-                            <StatItem value={stats.totalCount} suffix=" 張" />
+                            <StatItem value={stats.totalCount} suffix=" 張" delay={2.0} />
                         </div>
                     </div>
 
@@ -53,7 +54,7 @@ export function StatsOverview({ stats, loading }) {
                     <div className="flex flex-col items-center border-l border-gray-100">
                         <div className="text-gray-400 text-[10px] md:text-xs uppercase tracking-wider mb-1 font-semibold whitespace-nowrap">全台購買金額</div>
                         <div className="text-lg md:text-3xl font-bold text-gray-800">
-                            <StatItem value={totalSpent} suffix=" $" />
+                            <StatItem value={totalSpent} suffix=" $" delay={2.2} />
                         </div>
                     </div>
 

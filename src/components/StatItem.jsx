@@ -9,8 +9,13 @@ export function StatItem({ label, value, prefix = "", suffix = "", delay = 0, cl
     );
 
     useEffect(() => {
-        spring.set(value);
-    }, [value, spring]);
+        // Sync the start of the counting animation with the appearance delay
+        const timeout = setTimeout(() => {
+            spring.set(value);
+        }, delay * 1000); // Convert delay (seconds) to ms
+
+        return () => clearTimeout(timeout);
+    }, [value, spring, delay]);
 
     return (
         <motion.div

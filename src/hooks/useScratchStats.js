@@ -21,7 +21,11 @@ export function useScratchStats() {
             topProfitable: [],
             topCP: [],
             topLotteries: [],
-            topRegions: []
+            topRegions: [],
+            allProfitable: [],
+            allCP: [],
+            allLotteries: [],
+            allRegions: []
         }
     });
     // const [recentContributions, setRecentContributions] = useState([]); // Unused
@@ -80,14 +84,18 @@ export function useScratchStats() {
                     ls[lotteryId] = {
                         id: lotteryId,
                         name: lottery ? lottery.name : lotteryId,
-                        count: 0, win: 0, spent: 0, reports: 0
+                        count: 0, win: 0, spent: 0, reports: 0,
+                        winCount: 0, // Track number of winning tickets
+                        prizeDist: {} // Track distribution of prizes
                     };
                 }
                 if (isPast && !lsPast[lotteryId]) {
                     const lottery = mockLotteries.find(l => l.id === lotteryId);
                     lsPast[lotteryId] = {
                         id: lotteryId,
-                        count: 0, win: 0, spent: 0
+                        count: 0, win: 0, spent: 0,
+                        winCount: 0,
+                        prizeDist: {}
                     };
                 }
 
@@ -101,11 +109,33 @@ export function useScratchStats() {
                 ls[lotteryId].spent += (price * count);
                 ls[lotteryId].reports += 1;
 
+                if (dist > 0) {
+                    ls[lotteryId].winCount += count; // Assuming 'count' tickets all won 'dist' total? 
+                    // WAIT. 'dist' is 'win_amount' from data.
+                    // If submission has count=1, dist is separate.
+                    // If count > 1 (bulk), dist is total? Or per ticket?
+                    // Submission form says: entries have items. one item one ticket.
+                    // `result.push({ ..., count: 1, win_amount: ... })`.
+                    // So usually count is 1.
+                    // If count > 1, and win_amount > 0, does it mean ALL won?
+                    // User submission flow implies 1 ticket per entry if using detail mode.
+                    // So assuming dist > 0 means it's a winning ticket.
+                    if (!ls[lotteryId].prizeDist[dist]) ls[lotteryId].prizeDist[dist] = 0;
+                    ls[lotteryId].prizeDist[dist] += count;
+                } else {
+                    // Record $0 wins (losses) in prizeDist too?
+                    if (!ls[lotteryId].prizeDist[0]) ls[lotteryId].prizeDist[0] = 0;
+                    ls[lotteryId].prizeDist[0] += count; // 0 amount
+                }
+
                 // Update Past Lottery Stats
                 if (isPast) {
                     lsPast[lotteryId].count += count;
                     lsPast[lotteryId].win += dist;
                     lsPast[lotteryId].spent += (price * count);
+                    if (dist > 0) {
+                        lsPast[lotteryId].winCount += count;
+                    }
                 }
 
                 // --- Ticket Number Stats (Current & Past) ---
@@ -130,10 +160,11 @@ export function useScratchStats() {
                 // --- Region Stats (Current only for now) ---
                 if (location) {
                     if (!regionMap[location]) {
-                        regionMap[location] = { location, totalWin: 0, totalSpent: 0 };
+                        regionMap[location] = { location, totalWin: 0, totalSpent: 0, count: 0 };
                     }
                     regionMap[location].totalWin += dist;
                     regionMap[location].totalSpent += (price * count);
+                    regionMap[location].count += count;
                 }
             });
 
@@ -155,60 +186,49 @@ export function useScratchStats() {
             const lsArray = Object.values(ls);
             const lsArrayPast = Object.values(lsPast);
 
-            // 1. Top Profitable Numbers (Trend Calculation)
-            const sortProfitable = (a, b) => b.totalWin - a.totalWin;
-            const pastRankProfitable = getRankMap(ticketArrayPast, sortProfitable);
+            // --- Helper to calculate rankings with trend ---
+            const getRankedList = (items, sortFn, pastRankMap, idKey = 'ticketNo') => {
+                // 1. Sort
+                const sorted = [...items].sort(sortFn);
 
-            const topProfitable = [...ticketArray]
-                .sort(sortProfitable)
-                .slice(0, 3)
-                .map((item, index) => {
+                // 2. Map with Trend
+                return sorted.map((item, index) => {
                     const currentRank = index + 1;
-                    const pastRank = pastRankProfitable.get(item.ticketNo);
-                    let trend = 0; // 0 = same, >0 = up, <0 = down. 
-                    // Wait, usually Trend + means Position Improved (Rank number decreased).
-                    // e.g. Rank 5 -> Rank 1. Diff is 4.
-                    // So Trend = PastRank - CurrentRank.
+                    const id = item[idKey] || item.id; // handle ticketNo or lottery id
+                    const pastRank = pastRankMap ? pastRankMap.get(id) : undefined;
+
+                    let trend = 0;
                     if (pastRank) {
                         trend = pastRank - currentRank;
                     } else {
-                        trend = 999; // New/Skyrocketed
+                        trend = 999; // New
                     }
-                    return { ...item, trend };
+                    return { ...item, trend, rank: currentRank };
                 });
+            };
 
+            // 1. Profitable Numbers
+            const sortProfitable = (a, b) => b.totalWin - a.totalWin;
+            const pastRankProfitable = getRankMap(ticketArrayPast, sortProfitable);
+            const allProfitable = getRankedList(ticketArray, sortProfitable, pastRankProfitable, 'ticketNo');
+            const topProfitable = allProfitable.slice(0, 3);
 
-            // 2. Best CP Numbers (Trend)
+            // 2. Best CP Numbers
             const sortCP = (a, b) => {
                 const roiA = a.totalSpent > 0 ? (a.totalWin / a.totalSpent) : 0;
                 const roiB = b.totalSpent > 0 ? (b.totalWin / b.totalSpent) : 0;
                 return roiB - roiA;
             };
-            // Note: ticketArrayPast items need 'roi' calculated for sorting? No, sort logic handles it?
-            // sortCP calculates ROI inline.
-            // But ticketArray items in `topCP` need ROI property for display?
-            // The previous logic added `roi` property.
-
             const pastRankCP = getRankMap(ticketArrayPast, sortCP);
-
-            const topCP = [...ticketArray]
+            // Pre-calculate ROI for all items before ranking
+            const ticketArrayWithROI = ticketArray
                 .filter(t => t.totalSpent > 0)
-                .map(t => ({ ...t, roi: (t.totalWin / t.totalSpent) * 100 }))
-                .sort((a, b) => b.roi - a.roi) // Sort using pre-calculated ROI to match display
-                .slice(0, 3)
-                .map((item, index) => {
-                    const currentRank = index + 1;
-                    const pastRank = pastRankCP.get(item.ticketNo);
-                    let trend = 0;
-                    if (pastRank) {
-                        trend = pastRank - currentRank;
-                    } else {
-                        trend = 999;
-                    }
-                    return { ...item, trend };
-                });
+                .map(t => ({ ...t, roi: (t.totalWin / t.totalSpent) * 100 }));
 
-            // 3. Top Profitable Lotteries (Trend)
+            const allCP = getRankedList(ticketArrayWithROI, (a, b) => b.roi - a.roi, pastRankCP, 'ticketNo');
+            const topCP = allCP.slice(0, 3);
+
+            // 3. Profitable Lotteries
             const sortLotteryROI = (a, b) => {
                 const roiA = a.spent > 0 ? (a.win / a.spent) : 0;
                 const roiB = b.spent > 0 ? (b.win / b.spent) : 0;
@@ -216,30 +236,16 @@ export function useScratchStats() {
             };
             const pastRankLottery = getRankMap(lsArrayPast, sortLotteryROI);
 
-            const topLotteries = lsArray
+            const lsArrayWithROI = lsArray
                 .filter(l => l.spent > 0)
-                .map(l => ({
-                    ...l,
-                    roi: (l.win / l.spent) * 100
-                }))
-                .sort((a, b) => b.roi - a.roi)
-                .slice(0, 3)
-                .map((item, index) => {
-                    const currentRank = index + 1;
-                    const pastRank = pastRankLottery.get(item.id);
-                    let trend = 0;
-                    if (pastRank) {
-                        trend = pastRank - currentRank;
-                    } else {
-                        trend = 999;
-                    }
-                    return { ...item, trend };
-                });
+                .map(l => ({ ...l, roi: (l.win / l.spent) * 100 }));
 
-            // 4. Top Regions (No Trend required per user request "Number and Type", but harmless? Leave out for simplicity)
-            const topRegions = Object.values(regionMap)
-                .sort((a, b) => b.totalWin - a.totalWin)
-                .slice(0, 3);
+            const allLotteries = getRankedList(lsArrayWithROI, (a, b) => b.roi - a.roi, pastRankLottery, 'id');
+            const topLotteries = allLotteries.slice(0, 3);
+
+            // 4. Top Regions
+            const allRegions = getRankedList(Object.values(regionMap), (a, b) => b.totalWin - a.totalWin, undefined, 'location');
+            const topRegions = allRegions.slice(0, 3);
 
             setStats({
                 totalCount: tc,
@@ -249,7 +255,12 @@ export function useScratchStats() {
                     topProfitable,
                     topCP,
                     topLotteries,
-                    topRegions
+                    topRegions,
+                    // Full Lists for Detail View
+                    allProfitable,
+                    allCP,
+                    allLotteries,
+                    allRegions
                 }
             });
             setLoading(false);

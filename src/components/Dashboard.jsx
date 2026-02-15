@@ -49,7 +49,6 @@ export function Dashboard({ stats, loading }) {
                                     <div className="text-sm text-gray-500 mt-1 flex flex-wrap justify-center md:justify-start gap-3">
                                         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-400"></span> 回報人數: {lStat.reports}</span>
                                         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-400"></span> 總張數: {lStat.count}</span>
-                                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-400"></span> 一本{l.total_in_book}張</span>
                                     </div>
                                 </div>
 
@@ -74,6 +73,7 @@ export function Dashboard({ stats, loading }) {
             {selectedLottery && (
                 <PrizeStructureModal
                     lottery={selectedLottery}
+                    stats={selectedLottery ? (stats.lotteryStats[selectedLottery.id] || { count: 0, win: 0, spent: 0, reports: 0, winCount: 0, prizeDist: {} }) : null}
                     isOpen={!!selectedLottery}
                     onClose={() => setSelectedLottery(null)}
                 />

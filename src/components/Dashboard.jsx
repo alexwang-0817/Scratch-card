@@ -4,11 +4,17 @@ import { GlassCard } from './GlassCard';
 import mockLotteries from '../data/lotteries';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PrizeStructureModal } from './PrizeStructureModal';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Flame } from 'lucide-react';
 import { LotteryAvatar } from './LotteryAvatar';
 
 export function Dashboard({ stats, loading }) {
     const [selectedLottery, setSelectedLottery] = useState(null);
+
+    // Find the max count to determine the most popular lottery
+    const maxCount = React.useMemo(() => {
+        if (!stats || !stats.lotteryStats) return 0;
+        return Math.max(...Object.values(stats.lotteryStats).map(s => s.count), 0);
+    }, [stats]);
 
     if (loading) return (
         <div className="space-y-4 animate-pulse">
@@ -31,6 +37,11 @@ export function Dashboard({ stats, loading }) {
                         // const lRoi = spent > 0 ? (lStat.win / spent) * 100 : 0; // Deprecated
                         const lWinRate = lStat.count > 0 ? (lStat.winCount / lStat.count) * 100 : 0;
 
+                        // Actual Return Rate (ROI) based on reported stats
+                        const actualRoi = spent > 0 ? (lStat.win / spent) * 100 : 0;
+
+                        const isMostPopular = maxCount > 0 && lStat.count === maxCount;
+
                         return (
                             <div
                                 key={l.id}
@@ -48,6 +59,9 @@ export function Dashboard({ stats, loading }) {
                                 <div className="flex-grow text-left">
                                     <h4 className="font-bold text-lg text-gray-800 relative inline-flex items-center gap-2 group-hover:text-yellow-600 transition-colors">
                                         {l.name}
+                                        {isMostPopular && (
+                                            <Flame className="w-5 h-5 text-orange-500 fill-orange-500 animate-pulse" />
+                                        )}
                                         <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200 group-hover:border-yellow-100 group-hover:bg-yellow-50">${l.price}</span>
                                     </h4>
                                     <div className="text-sm text-gray-500 mt-1 flex flex-wrap justify-start gap-3">
@@ -71,7 +85,7 @@ export function Dashboard({ stats, loading }) {
                                         </div>
                                     )}
                                     <div className="text-[10px] md:text-xs text-gray-400 mt-1 flex items-center gap-1 whitespace-nowrap">
-                                        官方: {l.win_rate}%
+                                        回本率: {lStat.count > 0 ? `${actualRoi.toFixed(1)}%` : '-'}
                                         <ChevronRight className="w-3 h-3 text-gray-300 group-hover:text-yellow-400 opacity-0 group-hover:opacity-100 transition-all -mr-2 hidden md:block" />
                                     </div>
                                 </div>

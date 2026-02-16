@@ -144,7 +144,7 @@ export function PrizeStructureModal({ lottery, stats, isOpen, onClose }) {
                                         <div className="bg-gray-50 rounded-lg p-3 text-center">
                                             <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">回本率</div>
                                             <div className={`text-lg font-bold ${roi > 50 ? 'text-green-600' : roi >= 30 ? 'text-yellow-600' : 'text-gray-500'}`}>
-                                                {roi.toFixed(0)}%
+                                                {roi.toFixed(1)}%
                                             </div>
                                         </div>
                                     </div>

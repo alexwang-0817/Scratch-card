@@ -102,7 +102,7 @@ export function PrizeStructureModal({ lottery, stats, isOpen, onClose }) {
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none"
                     >
-                        <div className="w-full max-w-lg pointer-events-auto">
+                        <div className="w-full max-w-xl pointer-events-auto">
                             {/* Fixed Height: h-[85vh] */}
                             <GlassCard whileHover={{}} className="bg-white border-gray-200 shadow-2xl h-[85vh] flex flex-col transform-none">
                                 {/* Header */}
@@ -127,7 +127,7 @@ export function PrizeStructureModal({ lottery, stats, isOpen, onClose }) {
                                 </div>
 
                                 {/* Scrollable Content Area */}
-                                <div className="overflow-y-auto flex-1 custom-scrollbar p-4 pt-2">
+                                <div className="overflow-y-auto flex-1 custom-scrollbar px-3 py-4 pt-2">
 
                                     {/* Summary Stats */}
                                     <div className="grid grid-cols-3 gap-2 mb-6">
@@ -139,6 +139,9 @@ export function PrizeStructureModal({ lottery, stats, isOpen, onClose }) {
                                             <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">中獎機率</div>
                                             <div className={`text-lg font-bold ${winRate > 50 ? 'text-green-600' : winRate >= 30 ? 'text-yellow-600' : 'text-gray-500'}`}>
                                                 {winRate.toFixed(1)}%
+                                            </div>
+                                            <div className="text-[10px] text-gray-400 mt-1">
+                                                (官方: {lottery.win_rate}%)
                                             </div>
                                         </div>
                                         <div className="bg-gray-50 rounded-lg p-3 text-center">
